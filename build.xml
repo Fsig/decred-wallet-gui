@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="jar" basedir=".">
+
+    <property name="build.dir" value="bin"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="launch4j.dir" value="launch4j"/>
+    
+    <taskdef name="launch4j"
+        classname="net.sf.launch4j.ant.Launch4jTask"
+        classpath="${launch4j.dir}/launch4j.jar
+            :${launch4j.dir}/lib/xstream.jar" />
+
+    <target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+
+    <target name="init">
+        <mkdir dir="${build.dir}" />
+    </target>
+
+    <target name="compile" depends="clean, init">
+        <javac srcdir="src/com" destdir="${build.dir}" includeantruntime="false">
+            <classpath>
+                <path>
+                    <fileset dir="${lib.dir}">
+                        <include name="*.jar"/>
+                    </fileset>
+                </path>
+            </classpath>
+            <include name="**/*.java" />
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${build.dir}/DecredWallet.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="com.hosvir.decredwallet.DecredWallet" />
+            </manifest>
+            <fileset dir="${build.dir}" />
+            <fileset dir="src" includes="resources/**" />
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/tyrus-standalone-client-1.9.jar" />
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javax.websocket-client-api-1.1.jar" />
+            <zipfileset excludes="META-INF/*.SF" src="${lib.dir}/javax.websocket-api-1.1.jar" />
+        </jar>
+    </target>
+
+    <target name="exe" depends="jar">
+        <launch4j configFile="${launch4j.dir}/decred-wallet.xml" />
+   </target>
+
+</project>

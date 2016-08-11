@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Decred Wallet GUI
+Comment=Decred Wallet GUI
+Icon=decred
+Exec=decred
+Terminal=false
+Categories=Internet;
+MimeType=
+StartupNotify=true
