@@ -18,6 +18,7 @@ import com.hosvir.decredwallet.Api;
 import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.Processes;
 import com.hosvir.decredwallet.gui.interfaces.AddressBook;
+import com.hosvir.decredwallet.gui.interfaces.Footer;
 import com.hosvir.decredwallet.gui.interfaces.Login;
 import com.hosvir.decredwallet.gui.interfaces.Logs;
 import com.hosvir.decredwallet.gui.interfaces.Navbar;
@@ -76,6 +77,7 @@ public class Main extends BaseGame {
 	
 	public static boolean containsMouse = false;
 	public static boolean haveInit = false;
+	public static boolean exiting = false;
 	
 	/**
 	 * Constructor
@@ -132,6 +134,7 @@ public class Main extends BaseGame {
 		
 		//Initialise the canvas
 		canvas.init();
+		canvas.setFocusTraversalKeysEnabled(false);
 			
 		//Create a new keyboard and mouse
 		keyboard = new Keyboard();
@@ -146,6 +149,7 @@ public class Main extends BaseGame {
 		Images.init();
 		
 		Constants.navbar = new Navbar();
+		Constants.footer = new Footer();
 		Constants.guiInterfaces.add(new Login());
 		Constants.guiInterfaces.add(new Wallet());
 		Constants.guiInterfaces.add(new AddressBook());
@@ -164,6 +168,7 @@ public class Main extends BaseGame {
 		Constants.guiInterfaces.add(new Passphrase());
 		
 		Constants.navbar.init();
+		Constants.footer.init();
 		for(BaseGui bg : Constants.guiInterfaces) bg.init();
 		haveInit = true;
 
@@ -257,7 +262,9 @@ public class Main extends BaseGame {
 			
 			//Update nav
 			Constants.navbar.update(delta);
+			Constants.footer.update(delta);
 			if(Constants.navbar.containsMouse) containsMouse = true;
+			if(Constants.footer.containsMouse) containsMouse = true;
 			
 			//Update interfaces
 			for(BaseGui bg : Constants.guiInterfaces) {
@@ -276,15 +283,21 @@ public class Main extends BaseGame {
 			}
 			
 			//Cleanup logs, one log per update
+			if(Constants.getDaemonProcess() != null && Constants.getDaemonProcess().log.size() > Constants.maxLogLines) {
+				for(int i = 0; i < 100; i++)
+					Constants.getDaemonProcess().log.remove(i);
+			}
+			if(Constants.getWalletProcess() != null && Constants.getWalletProcess().log.size() > Constants.maxLogLines) {
+				for(int i = 0; i < 100; i++)
+					Constants.getWalletProcess().log.remove(i);
+			}
 			if(Constants.guiLog.size() > Constants.maxLogLines) {
 				for(int i = 0; i < 100; i++)
 					Constants.guiLog.remove(i);
-			}else if(Constants.getDcrdEndpoint().log.size() > Constants.maxLogLines) {
+			}
+			if(Constants.rpcLog.size() > Constants.maxLogLines) {
 				for(int i = 0; i < 100; i++)
-					Constants.getDcrdEndpoint().log.remove(i);
-			}else if(Constants.getDcrwalletEndpoint().log.size() > Constants.maxLogLines) {
-				for(int i = 0; i < 100; i++)
-					Constants.getDcrwalletEndpoint().log.remove(i);
+					Constants.rpcLog.remove(i);
 			}
 		}
 	}
@@ -301,18 +314,20 @@ public class Main extends BaseGame {
 			g.drawString("Loading...", (Engine.getWidth() / 2) - 30, (Engine.getHeight() / 2) - 30);
 			break;
 		case MAIN_MENU:
-			Constants.navbar.render(g);
+			if(Constants.isDaemonReady() && Constants.isWalletReady())
+				Constants.navbar.render(g);
 			
-			for(BaseGui bg : Constants.guiInterfaces) {
-				if(bg.isActive())
-					bg.render(g);
+			if(exiting) {
+				Constants.guiInterfaces.get(0).render(g);
+			}else{
+				for(BaseGui bg : Constants.guiInterfaces) {
+					if(bg.isActive())
+						bg.render(g);
+				}
 			}
 			
-			//Loading message
-			if(!Constants.isDaemonReady() || !Constants.isWalletReady()){	
-
-			}
-			
+			if(Constants.isDaemonReady() && Constants.isWalletReady())
+				Constants.footer.render(g);
 			break;
 		default:
 			break;
@@ -331,18 +346,32 @@ public class Main extends BaseGame {
 		
 		if(haveInit){
 			Constants.navbar.resize();
+			Constants.footer.resize();
 			for(BaseGui bg : Constants.guiInterfaces) bg.resize();
 		}
 	}
 	
 	@Override
 	public void quit() {		
+		exiting = true;
+		Login.loadingMessage = "";
+		Login.addLoadingMessage("Disconnecting from DCRD");
 		Constants.getDcrdEndpoint().disconnect();
+		Login.addLoadingMessage("Disconnecting from DCRWALLET");
 		Constants.getDcrwalletEndpoint().disconnect();
 		
 		//Clean up after yourself, but only if we started it 
-		if(Constants.getDaemonProcess() != null) Processes.killByName("dcrd");
-		if(Constants.getWalletProcess() != null) Processes.killByName("dcrwallet");
+		if(Constants.getWalletProcess() != null) {
+			Login.addLoadingMessage("Stopping DCRWALLET process");
+			Processes.killByName("dcrwallet");
+		}
+		
+		if(Constants.getDaemonProcess() != null) {
+			Login.addLoadingMessage("Stopping DCRD process");
+			Processes.killByName("dcrd");
+		}
+
+		Login.addLoadingMessage("Exiting");
 	}
 
 }

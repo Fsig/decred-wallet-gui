@@ -7,7 +7,6 @@ import com.deadendgine.utils.ImageUtils;
 /**
  * 
  * @author Troy
- * @version 1.00
  *
  */
 public class Images {
@@ -16,6 +15,9 @@ public class Images {
 	private static BufferedImage[] interfaces;
 	private static BufferedImage downArrow;
 	private static BufferedImage removeIcon;
+	private static BufferedImage[] loading;
+	private static BufferedImage[] footerIcons;
+	private static BufferedImage arrowDown;
 
 	/**
 	 * Load the images.
@@ -26,6 +28,9 @@ public class Images {
 		interfaces = ImageUtils.splitImage(ImageUtils.loadBufferedImage("resources/interface.png"), 20, 1);
 		downArrow = ImageUtils.loadBufferedImage("resources/down-arrow.png");
 		removeIcon = ImageUtils.loadBufferedImage("resources/remove-icon.png");
+		loading = ImageUtils.splitImage(ImageUtils.loadBufferedImage("resources/loading.png"), 6, 2);
+		footerIcons = ImageUtils.splitImage(ImageUtils.loadBufferedImage("resources/footericons.png"), 4, 2);
+		arrowDown = ImageUtils.loadBufferedImage("resources/arrowdown.png");
 	}
 	
 	public static BufferedImage getIcon() {
@@ -47,6 +52,17 @@ public class Images {
 	public static BufferedImage getRemoveIcon() {
 		return removeIcon;
 	}
-
+	
+	public static BufferedImage[] getLoading() {
+		return loading;
+	}
+	
+	public static BufferedImage[] getFooterIcons() {
+		return footerIcons;
+	}
+	
+	public static BufferedImage getArrowDown() {
+		return arrowDown;
+	}
 
 }

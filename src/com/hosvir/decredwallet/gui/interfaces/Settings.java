@@ -62,7 +62,7 @@ public class Settings extends Interface {
 		this.components.add(fpsMaxInput);
 		this.components.add(fpsMinInput);
 		
-		this.components.add(new Button("save", "Save", Engine.getWidth() - 150, Engine.getHeight() - 105, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+		this.components.add(new Button("save", "Save", Engine.getWidth() - 140, Engine.getHeight() - 130, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
 		this.components.add(new Dialog("errordiag", ""));
 	}
 	
@@ -151,25 +151,25 @@ public class Settings extends Interface {
 					20, 
 					150, 
 					10,
-					Engine.getHeight() - 200,
+					Engine.getHeight() - 230,
 					null);
 			
 			g.setColor(Color.WHITE);
 			g.fillRect(30, 
 					150, 
 					Engine.getWidth() - 60, 
-					Engine.getHeight() - 200);
+					Engine.getHeight() - 230);
 			
 			g.drawImage(Images.getInterfaces()[7], 
 					Engine.getWidth() - 30, 
 					150, 
 					10,
-					Engine.getHeight() - 200,
+					Engine.getHeight() - 230,
 					null);
 			
 			g.drawImage(Images.getInterfaces()[19], 
 					24, 
-					Engine.getHeight() - 60, 
+					Engine.getHeight() - 90, 
 					Engine.getWidth() - 48,
 					60,
 					null);
@@ -233,8 +233,8 @@ public class Settings extends Interface {
 		getComponentByName("maxLogLinesInput").width = Engine.getWidth() - 295;
 		getComponentByName("fpsMaxInput").width = Engine.getWidth() - 295;
 		getComponentByName("fpsMinInput").width = Engine.getWidth() - 295;
-		getComponentByName("save").x = Engine.getWidth() - 150;
-		getComponentByName("save").y = Engine.getHeight() - 105;
+		getComponentByName("save").x = Engine.getWidth() - 140;
+		getComponentByName("save").y = Engine.getHeight() - 130;
 
 		getComponentByName("langSelect").resize();
 		getComponentByName("doubleClickDelayInput").resize();

@@ -44,7 +44,7 @@ public class Staking extends Interface implements MouseWheelListener {
 		this.components.add(new Dialog("errordiag", ""));
 		
 		headerThird = Engine.getWidth() / 9;
-		scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2);
+		scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 		
 		Main.canvas.addMouseWheelListener(this);
 		
@@ -384,7 +384,7 @@ public class Staking extends Interface implements MouseWheelListener {
 			if(scrollOffset > Constants.globalCache.tickets.size() *70) scrollOffset = Constants.globalCache.tickets.size() *70;
 			
 			if(Constants.globalCache.tickets.size() > 0){
-				scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2);
+				scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 				if(scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
 				if(scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
 			}

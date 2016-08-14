@@ -33,12 +33,6 @@ public class DecredWallet {
 		
 		//Launch GUI
 		Constants.setMainGui(new Main());
-		
-		//Update Global cache
-		Constants.globalCache.forceUpdate = true;
-		Constants.globalCache.forceUpdatePeers = true;
-		Constants.globalCache.forceUpdateInfo = true;
-		Constants.globalCache.forceUpdateTickets = true;
 	}
 	
 }

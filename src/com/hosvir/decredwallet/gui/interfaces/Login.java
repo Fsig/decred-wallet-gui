@@ -2,14 +2,14 @@ package com.hosvir.decredwallet.gui.interfaces;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 
 import com.deadendgine.Engine;
+import com.deadendgine.input.Keyboard;
 import com.hosvir.decredwallet.Constants;
-import com.hosvir.decredwallet.LocalProcess;
-import com.hosvir.decredwallet.Processes;
+import com.hosvir.decredwallet.StartProcesses;
 import com.hosvir.decredwallet.gui.Button;
 import com.hosvir.decredwallet.gui.ColorConstants;
 import com.hosvir.decredwallet.gui.Component;
@@ -32,6 +32,10 @@ import com.hosvir.decredwallet.utils.Keystore;
 public class Login extends Interface {	
 	private JFileChooser fileChooser;
 	private String loginMessage = "Decred Wallet requires an active DCRD RPC server\nfor sending and receiving transactions on the Decred\nnetwork. Enter your RPC connection information and\ncredentials below.";
+	public static String loadingMessage = "";
+	public static boolean startLocal = false;
+	public static boolean attemptConnect = false;
+	private StartProcesses startProcesses;
 	
 	@Override
 	public void init() {
@@ -67,6 +71,117 @@ public class Login extends Interface {
 		//Update
 		super.update(delta);
 		
+		//Tab
+		if(Keyboard.isKeyDown(KeyEvent.VK_TAB)) {
+			if(!getComponentByName("address").isActive() && !getComponentByName("username").isActive() && !getComponentByName("password").isActive()){
+				getComponentByName("address").selectedId = 0;
+				Constants.unselectOtherInputs(components, getComponentByName("address"));
+			}else if(getComponentByName("address").isActive()){
+				getComponentByName("username").selectedId = 0;
+				Constants.unselectOtherInputs(components, getComponentByName("username"));
+			}else if(getComponentByName("username").isActive()){
+				getComponentByName("password").selectedId = 0;
+				Constants.unselectOtherInputs(components, getComponentByName("password"));
+			}else if(getComponentByName("password").isActive()){
+				getComponentByName("address").selectedId = 0;
+				Constants.unselectOtherInputs(components, getComponentByName("address"));
+			}
+			
+			Keyboard.release(KeyEvent.VK_TAB);
+		}
+		
+		//Enter
+		if(Keyboard.isKeyDown(KeyEvent.VK_ENTER) && getComponentByName("password").isActive()) {
+			getComponentByName("confirm").selectedId = 0;
+			Keyboard.release(KeyEvent.VK_ENTER);
+		}
+		
+		//Connect
+		if(!startLocal && attemptConnect) {
+			//Attempt to connect to DCRD
+			Constants.getDcrdEndpoint().connect(getComponentByName("username").text, getComponentByName("password").text);
+			if(Constants.getDcrdEndpoint().connected && Constants.getDcrdEndpoint().error == -1){
+				Constants.setDaemonReady(true);
+				
+				//Attempt to connect to DCRWALLET
+				Constants.getDcrwalletEndpoint().connect(getComponentByName("username").text, getComponentByName("password").text);
+				if(Constants.getDcrwalletEndpoint().connected && Constants.getDcrwalletEndpoint().error == -1){
+					Constants.setWalletReady(true);
+					Constants.navbar.selectedId = 6;
+					getComponentByName("password").text = "";
+					loadingMessage = "Connected";
+				}else {
+					switch(Constants.getDcrwalletEndpoint().error){
+					case 1: //Connection error
+						Constants.log("ERROR Connection Refused, check to make sure DCRWALLET is running on the specified IP.");
+						getComponentByName("errordiag").text = Constants.getLangValue("Error") + " Connection Refused, check to make sure DCRWALLET is running on the specified IP Address.";
+						
+						//Show dialog
+						this.blockInput = true;
+						Constants.navbar.blockInput = true;
+						getComponentByName("errordiag").selectedId = 0;
+						break;
+					case 2: //SSL error
+						Constants.log("DCRWALLET SSL Error, check you specified to correct certificate.");
+						getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRWALLET SSL Error, check you specified the correct certificate";
+						
+						//Show dialog
+						this.blockInput = true;
+						Constants.navbar.blockInput = true;
+						getComponentByName("errordiag").selectedId = 0;
+						break;
+					case 3: //Authentication error
+						Constants.log("Failed to connect to DCRWALLET, check your username and password are correct.");
+						getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRWALLET Authentication Failed, check your username and password are correct.";
+						
+						//Show dialog
+						this.blockInput = true;
+						Constants.navbar.blockInput = true;
+						getComponentByName("errordiag").selectedId = 0;
+						break;
+					}
+				}
+			}else {
+				switch(Constants.getDcrdEndpoint().error){
+				case 1: //Connection error
+					Constants.log("ERROR Connection Refused, check to make sure DCRD is running on the specified IP.");
+					getComponentByName("errordiag").text = Constants.getLangValue("Error") + " Connection Refused, check to make sure DCRD is running on the specified IP Address.";
+					
+					//Show dialog
+					this.blockInput = true;
+					Constants.navbar.blockInput = true;
+					getComponentByName("errordiag").selectedId = 0;
+					break;
+				case 2: //SSL error
+					Constants.log("SSL Error, check you specified to correct certificate.");
+					getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRD SSL Error, check you specified the   correct certificate";
+					
+					//Show dialog
+					this.blockInput = true;
+					Constants.navbar.blockInput = true;
+					getComponentByName("errordiag").selectedId = 0;
+					break;
+				case 3: //Authentication error
+					Constants.log("Failed to connect to DCRD, check your username and password are correct.");
+					getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRD Authentication Failed, check your username and password are correct.";
+					
+					//Show dialog
+					this.blockInput = true;
+					Constants.navbar.blockInput = true;
+					getComponentByName("errordiag").selectedId = 0;
+					break;
+				}
+			}
+			
+
+			//Enable button again
+			getComponentByName("address").enabled = true;
+			getComponentByName("username").enabled = true;
+			getComponentByName("password").enabled = true;
+			getComponentByName("confirm").enabled = true;
+			
+			attemptConnect = false;
+		}
 		
 		//For each component
 		for(Component c : components) {
@@ -74,10 +189,13 @@ public class Login extends Interface {
 					
 			//Buttons
 			if(c instanceof Button) {
-				if(c.selectedId == 0 && c.enabled){
+				if(c.selectedId == 0 && c.enabled || Constants.autoStart){
 					switch(c.name){
 					case "confirm":
 						//Don't allow multiple presses
+						getComponentByName("address").enabled = false;
+						getComponentByName("username").enabled = false;
+						getComponentByName("password").enabled = false;
 						getComponentByName("confirm").enabled = false;
 						
 						//Update end points
@@ -86,137 +204,23 @@ public class Login extends Interface {
 							Constants.setDcrwalletEnpointURI(getComponentByName("address").text);
 						}
 						
+						//Random username/password
+						if(getComponentByName("username").text == "") {
+							getComponentByName("username").text = Constants.getDaemonUsername();
+							getComponentByName("password").text = Constants.getDaemonPassword();
+							
+							addLoadingMessage("Starting Decred with random usename and password.");
+						}
+						
 						//If we are on localhost
 						if(getComponentByName("address").text == "" || getComponentByName("address").text == "localhost" || getComponentByName("address").text == "127.0.0.0.1") {
-							
-							//No local DCRD
-							if(Processes.getClosestProcess("dcrd") == -1){ 								
-								getComponentByName("errordiag").text = "Starting local DCRD process, this may take a minute.";
-								
-								//Show dialog
-								this.blockInput = true;
-								Constants.navbar.blockInput = true;
-								getComponentByName("errordiag").selectedId = 0;
-								
-								//Start DCRD
-								Constants.log("Starting Daemon.");
-								Constants.setDaemonProcess(new LocalProcess(Constants.getDaemonCommand()));
-									
-								//Check to see if the daemon is ready
-								while(!Constants.isDaemonProcessReady()){
-									for(String s : Constants.getDaemonProcess().log)
-										if(s.contains("RPC server listening"))
-											Constants.setDaemonProcessReady(true);
-										
-									//Sleep
-									sleep(100);
-								}
-							}
-							
-							//No local DCRWALLET
-							if(Processes.getClosestProcess("dcrwallet") == -1) {
-								JOptionPane.showMessageDialog(null, 
-										"Starting local DCRWALLET process, this may take a minute.",
-										"Decred Wallet",
-										JOptionPane.INFORMATION_MESSAGE);
-								
-								//Start DCRWALLET
-								Constants.log("Starting Wallet.");
-								Constants.setWalletProcess(new LocalProcess(Constants.getWalletCommand()));
-							
-								//Check to see if the daemon is ready
-								while(!Constants.isWalletProcessReady()){
-									for(String s : Constants.getWalletProcess().log)
-										if(s.contains("Opened wallet"))
-											Constants.setWalletProcessReady(true);
-										else if(s.contains("invalid passphrase for master public key"))
-											Constants.log("Need public key, edit settings.conf");
-										
-									//Sleep
-									sleep(100);
-								}
-								
-								sleep(2000);
-							}
+							startLocal = true;
+							startProcesses = new StartProcesses();
+							startProcesses.start();
 						}
 						
-						//Attempt to connect to DCRD
-						Constants.getDcrdEndpoint().connect(getComponentByName("username").text, getComponentByName("password").text);
-						if(Constants.getDcrdEndpoint().connected && Constants.getDcrdEndpoint().error == -1){
-							Constants.setDaemonReady(true);
-							
-							//Attempt to connect to DCRWALLET
-							Constants.getDcrwalletEndpoint().connect(getComponentByName("username").text, getComponentByName("password").text);
-							if(Constants.getDcrwalletEndpoint().connected && Constants.getDcrwalletEndpoint().error == -1){
-								Constants.setWalletReady(true);
-								Constants.navbar.selectedId = 6;
-								getComponentByName("password").text = "";
-							}else {
-								switch(Constants.getDcrwalletEndpoint().error){
-								case 1: //Connection error
-									Constants.log("ERROR Connection Refused, check to make sure DCRWALLET is running on the specified IP.");
-									getComponentByName("errordiag").text = Constants.getLangValue("Error") + " Connection Refused, check to make sure DCRWALLET is running on the specified IP Address.";
-									
-									//Show dialog
-									this.blockInput = true;
-									Constants.navbar.blockInput = true;
-									getComponentByName("errordiag").selectedId = 0;
-									break;
-								case 2: //SSL error
-									Constants.log("DCRWALLET SSL Error, check you specified to correct certificate.");
-									getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRWALLET SSL Error, check you specified the correct certificate";
-									
-									//Show dialog
-									this.blockInput = true;
-									Constants.navbar.blockInput = true;
-									getComponentByName("errordiag").selectedId = 0;
-									break;
-								case 3: //Authentication error
-									Constants.log("Failed to connect to DCRWALLET, check your username and password are correct.");
-									getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRWALLET Authentication Failed, check your username and password are correct.";
-									
-									//Show dialog
-									this.blockInput = true;
-									Constants.navbar.blockInput = true;
-									getComponentByName("errordiag").selectedId = 0;
-									break;
-								}
-							}
-						}else {
-							switch(Constants.getDcrdEndpoint().error){
-							case 1: //Connection error
-								Constants.log("ERROR Connection Refused, check to make sure DCRD is running on the specified IP.");
-								getComponentByName("errordiag").text = Constants.getLangValue("Error") + " Connection Refused, check to make sure DCRD is running on the specified IP Address.";
-								
-								//Show dialog
-								this.blockInput = true;
-								Constants.navbar.blockInput = true;
-								getComponentByName("errordiag").selectedId = 0;
-								break;
-							case 2: //SSL error
-								Constants.log("SSL Error, check you specified to correct certificate.");
-								getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRD SSL Error, check you specified the   correct certificate";
-								
-								//Show dialog
-								this.blockInput = true;
-								Constants.navbar.blockInput = true;
-								getComponentByName("errordiag").selectedId = 0;
-								break;
-							case 3: //Authentication error
-								Constants.log("Failed to connect to DCRD, check your username and password are correct.");
-								getComponentByName("errordiag").text = Constants.getLangValue("Error") + " DCRD Authentication Failed, check your username and password are correct.";
-								
-								//Show dialog
-								this.blockInput = true;
-								Constants.navbar.blockInput = true;
-								getComponentByName("errordiag").selectedId = 0;
-								break;
-							}
-						}
-						
-
-						//Enable button again
-						getComponentByName("confirm").enabled = true;
+						attemptConnect = true;
+						Constants.autoStart = false;
 						break;
 					}
 				}
@@ -296,6 +300,16 @@ public class Login extends Interface {
 		GraphicsUtils.drawString(g, loginMessage, Engine.getWidth() / 2 - 180, Engine.getHeight() / 2 - 140);
 		
 		
+		//Loading message
+		if(loadingMessage.length() > 0) {
+			g.setColor(ColorConstants.flatRed);
+			
+			GraphicsUtils.drawString(g, 
+					loadingMessage, 
+					(Engine.getWidth() / 2) - (g.getFontMetrics().stringWidth(loadingMessage.split("\n")[0]) / 2) , 
+					Engine.getHeight() / 2 + 230);
+		}
+		
 		//Render
 		super.render(g);
 	}
@@ -324,24 +338,17 @@ public class Login extends Interface {
 			getComponentByName("help").resize();
 			getComponentByName("import").resize();
 		}
+		
+		super.resize();
 	}
 
 	@Override
 	public boolean isActive() {
 		return (!Constants.getDcrdEndpoint().connected || !Constants.getDcrwalletEndpoint().connected);
 	}
-	
-	/**
-	 * Sleep the thread
-	 * 
-	 * @param time
-	 */
-	private void sleep(int time) {
-		try {
-			Thread.sleep(time);
-		}catch(InterruptedException e) {
-			e.printStackTrace();
-		}
+
+	public static void addLoadingMessage(String message) {
+		loadingMessage = message + "\n" + loadingMessage;
 	}
 
 }

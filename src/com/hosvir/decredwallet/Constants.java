@@ -26,6 +26,7 @@ import com.hosvir.decredwallet.gui.BaseGui;
 import com.hosvir.decredwallet.gui.Component;
 import com.hosvir.decredwallet.gui.InputBox;
 import com.hosvir.decredwallet.gui.Main;
+import com.hosvir.decredwallet.gui.interfaces.Footer;
 import com.hosvir.decredwallet.gui.interfaces.Navbar;
 import com.hosvir.decredwallet.utils.FileUtils;
 import com.hosvir.decredwallet.utils.FileWriter;
@@ -116,19 +117,24 @@ public class Constants {
 	public static HashMap<String, String> langValues = new HashMap<String, String>();
 	public static ArrayList<String> stakePools = new ArrayList<String>();
 	public static Navbar navbar;
+	public static Footer footer;
 	public static GlobalCache globalCache;
 	public static String accountToRename;
+	
+	public static boolean autoStart;
+	public static ArrayList<String> rpcLog;
 
 	
 	/**
 	 * Initialise constants.
 	 */
 	public static void initialise() {
-		version = "0.2.6";
-		buildDate = "11/08/2016";
+		version = "0.2.7";
+		buildDate = "14/08/2016";
 		random = new Random();
 		guiLog = new ArrayList<String>();
 		langFiles = new ArrayList<String>();
+		rpcLog = new ArrayList<String>();
 		
 		System.out.println("Created by Fsig.");
 		System.out.println("Version: " + Constants.getVersion());
@@ -178,8 +184,10 @@ public class Constants {
 		allowedPasswordClasses = new ArrayList<String>();
 		allowedPasswordClasses.add("com.hosvir.decredwallet.DecredWallet");
 		allowedPasswordClasses.add("com.hosvir.decredwallet.Api");
+		allowedPasswordClasses.add("com.hosvir.decredwallet.StartProcesses");
 		allowedPasswordClasses.add("com.hosvir.decredwallet.utils.Keystore");
 		allowedPasswordClasses.add("com.hosvir.decredwallet.gui.interfaces.Login");
+		
 		
 		langConfFiles.add("English.conf");
 		langConfFiles.add("German.conf");
@@ -309,6 +317,12 @@ public class Constants {
 		rpcDaemonIp = "127.0.0.1";
 		rpcWalletIp = "127.0.0.1";
 		
+		//Check for random username/password
+		if(daemonUsername.trim().equals("random") && daemonPassword.trim().equals("random")) { 
+			daemonUsername = generateRandomString(random.random(16, 26));
+			daemonPassword = generateRandomString(random.random(16, 26));
+			autoStart = true;
+		}
 		
 		daemonCommand = osQuote + decredLocation + daemonBin + osQuote + " -u " + osQuote + 
 						daemonUsername + osQuote + " -P " + osQuote +
@@ -394,8 +408,9 @@ public class Constants {
 			FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Decred-Location=/home/ubuntu/decred/", true, true);
 		}
 		
-		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Username=username", true, true);
-		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Password=password", true, true);
+		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#To autostart Decred leave the username and password as random", true, true);
+		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Username=random", true, true);
+		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Password=random", true, true);
 		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Public-Password=", true, true);
 		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Testnet=false", true, true);
 		FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
@@ -608,7 +623,7 @@ public class Constants {
 	 * 
 	 * @return String
 	 */
-	public static String getWalletDate(Long timestamp){
+	public static String getWalletDate(long timestamp){
 		date = new Date();
 		date.setTime(timestamp*1000);
 		return wsdf.format(date);
@@ -620,7 +635,7 @@ public class Constants {
 	 * @param timestamp
 	 * @return String
 	 */
-	public static String formatDate(Long timestamp){
+	public static String formatDate(long timestamp){
 		date = new Date();
 		date.setTime(timestamp*1000);
 		return sdf.format(date);
@@ -819,8 +834,15 @@ public class Constants {
 						!Constants.globalCache.transactions.get(i).getValueByName("txtype").trim().equals("ticket") || 
 						(isDefault && Constants.globalCache.transactions.get(i).getValueByName("account").trim().length() == 0 && 
 						!Constants.globalCache.transactions.get(i).getValueByName("txtype").trim().equals("vote") && 
-						!Constants.globalCache.transactions.get(i).getValueByName("txtype").trim().equals("ticket")))
-					transactions.add(Constants.globalCache.transactions.get(i));
+						!Constants.globalCache.transactions.get(i).getValueByName("txtype").trim().equals("ticket"))){
+					
+					if(Constants.globalCache.transactions.get(i).getValueByName("category").trim().equals("send") && 
+							Constants.globalCache.transactions.get(i).getValueByName("fee").trim().equals("0")){
+						//System.out.println("Hiding counter transaction");
+					}else{
+						transactions.add(Constants.globalCache.transactions.get(i));
+					}
+				}
 			}
 		}
 		
@@ -1120,5 +1142,5 @@ public class Constants {
 	public static String getKeystore() {
 		return keystore;
 	}
-	
+		
 }

@@ -9,6 +9,7 @@ import java.awt.event.MouseWheelListener;
 
 import com.deadendgine.Engine;
 import com.deadendgine.input.Mouse;
+import com.hosvir.decredwallet.Account;
 import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.gui.Button;
 import com.hosvir.decredwallet.gui.ColorConstants;
@@ -18,6 +19,7 @@ import com.hosvir.decredwallet.gui.FontConstants;
 import com.hosvir.decredwallet.gui.Images;
 import com.hosvir.decredwallet.gui.Interface;
 import com.hosvir.decredwallet.gui.Main;
+import com.hosvir.decredwallet.gui.ReloadButton;
 
 /**
  * 
@@ -33,26 +35,29 @@ public class Wallet extends Interface implements MouseWheelListener {
 	private int scrollMinHeight = 160;
 	private int scrollMaxHeight;
 	private int scrollCurrentPosition = 160;
+	private boolean reloadStarted = false;
+	private boolean reloadComplete = true;
 	
 	
 	@Override
 	public void init() {
 		headerThird = (Engine.getWidth() - 200) / 4;
 		
-		this.components.add(new Button("add", Constants.getLangValue("Add-Button-Text"), 20, Engine.getHeight() - 80, 255, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+		this.components.add(new Button("add", Constants.getLangValue("Add-Button-Text"), 20, Engine.getHeight() - 110, 255, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+		this.components.add(new ReloadButton("reload", Engine.getWidth() - 48, 95, 32, 32));
 		
 		Dialog errorDiag = new Dialog("errordiag", "");
 		errorDiag.width = 800;
 		errorDiag.resize();
 		this.components.add(errorDiag);
 		
-		scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2);
+		scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 		
 		Main.canvas.addMouseWheelListener(this);
 	}
 
 	@Override
-	public void update(long delta) {
+	public void update(long delta) {		
 		//Allow diag closing
 		if(getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
 		
@@ -87,6 +92,28 @@ public class Wallet extends Interface implements MouseWheelListener {
 						
 						//Release button
 						c.selectedId = -1;
+					}
+				}
+				
+				//Manual reload
+				if(c instanceof ReloadButton) {
+					if(c.selectedId == 0 && c.enabled && !reloadStarted){
+						Constants.reloadAccounts();
+						reloadStarted = true;
+					}
+					
+					if(reloadStarted) {
+						reloadComplete = true;
+						
+						for(Account a : Constants.accounts) {
+							if(!a.reloadComplete) reloadComplete = false;
+						}
+						
+						//Release button
+						if(reloadComplete) {
+							c.selectedId = -1;
+							reloadStarted = false;
+						}
 					}
 				}
 			}
@@ -226,7 +253,7 @@ public class Wallet extends Interface implements MouseWheelListener {
 					g.setFont(FontConstants.addressFont);
 					if(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("address") != null){
 						g.drawString(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("address"), 
-								(Engine.getWidth() - (g.getFontMetrics().stringWidth(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("address")) / 2)) / 2, 
+								(Engine.getWidth() - (g.getFontMetrics().stringWidth(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("address")) / 2)) / 2 + 60, 
 								204 + i*70 - scrollOffset);
 					}
 					
@@ -234,7 +261,7 @@ public class Wallet extends Interface implements MouseWheelListener {
 					if(txHoverId == i) g.setColor(ColorConstants.flatBlue); else g.setColor(ColorConstants.labelColor);
 					g.setFont(FontConstants.transactionFont);
 					g.drawString(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("txid"), 
-							(Engine.getWidth() - (g.getFontMetrics().stringWidth(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("txid")) / 2)) / 2, 
+							(Engine.getWidth() - (g.getFontMetrics().stringWidth(Constants.accounts.get(selectedId).transactions.get(i).getValueByName("txid")) / 2)) / 2 + 30, 
 							226 + i*70 - scrollOffset);
 					
 					//Draw amount
@@ -351,8 +378,11 @@ public class Wallet extends Interface implements MouseWheelListener {
 		headerThird = (Engine.getWidth() - 200) / 4;
 		
 		if(getComponentByName("add") != null) {
-			getComponentByName("add").y = Engine.getHeight() - 80;
+			getComponentByName("add").y = Engine.getHeight() - 110;
 			getComponentByName("add").resize();
+			
+			getComponentByName("reload").x = Engine.getWidth() - 48;
+			getComponentByName("reload").resize();
 		}
 		
 		super.resize();
@@ -380,7 +410,7 @@ public class Wallet extends Interface implements MouseWheelListener {
 			if(scrollOffset > (Constants.accounts.get(selectedId).transactions.size()-1)*70) scrollOffset = (Constants.accounts.get(selectedId).transactions.size()-1)*70;
 			
 			if(Constants.accounts.get(selectedId).transactions.size() > 0){
-				scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2);
+				scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 				if(scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
 				if(scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
 			}

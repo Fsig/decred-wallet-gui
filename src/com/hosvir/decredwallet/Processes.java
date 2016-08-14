@@ -134,7 +134,7 @@ public class Processes {
 			result = "";
 	
 			while(regexMatcher.find()) {
-				if(!regexMatcher.group().contains(",") && !regexMatcher.group().contains("%")){
+				if(!regexMatcher.group().contains(",") && !regexMatcher.group().contains("%") && regexMatcher.group().length() > 25){
 					string = StringUtils.backspace(regexMatcher.group().replaceAll("\\s+", ","));
 					
 					if(string.startsWith(","))

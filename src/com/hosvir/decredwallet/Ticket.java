@@ -30,7 +30,13 @@ public class Ticket {
 		
 		this.amount = transaction.get(0).getValueByName("amount");
 		this.fee = transaction.get(0).getValueByName("fee");
-		this.confirmations = Integer.valueOf(transaction.get(0).getValueByName("confirmations"));
+		
+		try{
+			this.confirmations = Integer.valueOf(transaction.get(0).getValueByName("confirmations"));
+		}catch(Exception e){
+			this.confirmations = -1;
+		}
+		
 		this.blockHash = transaction.get(0).getValueByName("blockhash");
 		this.time = transaction.get(0).getValueByName("time");
 		this.voteBits = Integer.valueOf(transaction.get(0).getValueByName("vout"));

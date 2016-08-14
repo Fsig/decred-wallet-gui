@@ -32,7 +32,6 @@ import com.hosvir.decredwallet.utils.Param;
 
 @ClientEndpoint
 public class DecredEndpoint extends Thread implements Endpoint {
-	public ArrayList<String> log;
 	public boolean connected;
 	public int error;
 	private Random random;
@@ -45,6 +44,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
 	private ArrayList<String> readResultQueue;
 	private ArrayList<String> removeResultQueue;
 	private Timer connectTimer;
+	private Timer resultTimer;
 		
 	/**
 	 * Construct a new Decred Endpoint
@@ -52,7 +52,6 @@ public class DecredEndpoint extends Thread implements Endpoint {
 	 * @param uri
 	 */
 	public DecredEndpoint(String uri){
-		this.log = new ArrayList<String>();
 		this.uri = uri;
 		random = new Random();
 		latch = new CountDownLatch(1);
@@ -60,6 +59,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
 		readResultQueue = new ArrayList<String>();
 		removeResultQueue = new ArrayList<String>();
 		connectTimer = new Timer(5000);
+		resultTimer = new Timer(10000);
 		
 		this.setName("JDecredWallet - Endpoint Thread");
 		this.setPriority(NORM_PRIORITY);
@@ -177,7 +177,8 @@ public class DecredEndpoint extends Thread implements Endpoint {
 			}
 				
 			//Wait for result
-			while(getResult(id) == null){
+			resultTimer.reset();
+			while(getResult(id) == null && !resultTimer.isUp()){
 				try {
 					latch.await(100, TimeUnit.MICROSECONDS);
 				}catch(InterruptedException e) {
@@ -187,9 +188,11 @@ public class DecredEndpoint extends Thread implements Endpoint {
 				
 			//Have the result
 			String result = getResult(id);
-			removeResultQueue.add(result);
-			log.add(result);
-			if(Constants.guiInterfaces != null && Constants.guiInterfaces.size() > 5) Constants.guiInterfaces.get(5).resize();
+			if(result != null) {
+				removeResultQueue.add(result);
+				Constants.rpcLog.add(result);
+				if(Constants.guiInterfaces != null && Constants.guiInterfaces.size() > 5) Constants.guiInterfaces.get(5).resize();
+			}
 				
 			return result;
 		}else{
@@ -251,9 +254,13 @@ public class DecredEndpoint extends Thread implements Endpoint {
     	readResultQueue.addAll(resultQueue);
     	
     	for(String s : readResultQueue){
-    		ArrayList<JsonObject> jsonObjects = Json.parseJson(s);
-    		if(jsonObjects.get(jsonObjects.size()-1).getValueByName("result").trim().equals(String.valueOf(id)))
-    			return s;
+    		try{
+	    		ArrayList<JsonObject> jsonObjects = Json.parseJson(s);
+	    		if(jsonObjects.get(jsonObjects.size()-1).getValueByName("result").trim().equals(String.valueOf(id)))
+	    			return s;
+    		}catch(Exception e) {
+    			e.printStackTrace();
+    		}
     	}
     	
     	return null;

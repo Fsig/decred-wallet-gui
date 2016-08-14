@@ -91,7 +91,7 @@ public class InputBox extends Component implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(selectedId == 0){
+		if(isActive()){
 			if(Keyboard.isKeyDown(KeyEvent.VK_CONTROL) && Keyboard.isKeyDown(KeyEvent.VK_V)){
 				text += Constants.getClipboardString();
 			}else if(Keyboard.isKeyDown(KeyEvent.VK_CONTROL) && Keyboard.isKeyDown(KeyEvent.VK_C)){
@@ -108,6 +108,7 @@ public class InputBox extends Component implements KeyListener {
 				case KeyEvent.VK_ALT:
 					break;
 				default:
+					if(e.getKeyCode() != KeyEvent.VK_TAB && e.getKeyCode() != KeyEvent.VK_ENTER)
 					text += e.getKeyChar();
 					break;
 				}

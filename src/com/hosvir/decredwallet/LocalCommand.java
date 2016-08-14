@@ -36,10 +36,10 @@ public class LocalCommand {
         try {
         	if(command.contains("dcrctl")) Constants.logWithoutSystem(command.replaceAll("-u '(.*?)'", "-u '***'").replaceAll("-P '(.*?)'", "-P '***'").replaceAll("--walletpass '(.*?)'", "--walletpass '***'").replaceAll("walletpassphrase '(.*?)'", "walletpassphrase '***'"));
         	
-        	if(Constants.isOsLinux()){
-        		commands = new String[]{"/bin/sh","-c", command};
-        	}else if(Constants.isOsWindows()){
+        	if(Constants.isOsWindows()){
         		commands = new String[]{"cmd","/c", command};
+        	}else{
+        		commands = new String[]{"/bin/sh","-c", command};
         	}
         	
         	process = new ProcessBuilder(commands).start();

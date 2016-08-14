@@ -14,6 +14,7 @@ import com.hosvir.decredwallet.utils.JsonObject;
 public class Account extends Thread implements Updatable {
 	private boolean running;
 	public boolean forceUpdate;
+	public boolean reloadComplete;
 	private Timer updateTimer = new Timer(1000);
 	public String name;
 	public String balance = "0";
@@ -53,18 +54,24 @@ public class Account extends Thread implements Updatable {
 
 	@Override
 	public void update(long delta) {
-		if(updateTimer.isUp() || forceUpdate){
-			balance = Api.getBalance(name);
-			spendableBalance = Api.getBalanceSpendable(name);
-			pendingBalance = String.valueOf(Double.valueOf(spendableBalance) - Double.valueOf(balance));
-			lockedBalance = Api.getLockedBalance(name);
-			totalBalance = Api.getBalanceAll(name);
-			addresses = Api.getAddressesByAccount(name).split(",");
-			transactions = Constants.getTransactionsByAccount(name);
-			
-			if(updateTimer.timeLimit <= 180000) updateTimer.timeLimit = Constants.getRandomNumber(100000, 180000);
-			updateTimer.reset();
-			forceUpdate = false;
+		try {
+			if(updateTimer.isUp() || forceUpdate){
+				reloadComplete = false;
+				balance = Api.getBalance(name);
+				spendableBalance = Api.getBalanceSpendable(name);
+				pendingBalance = String.valueOf(Double.valueOf(spendableBalance) - Double.valueOf(balance));
+				lockedBalance = Api.getLockedBalance(name);
+				totalBalance = Api.getBalanceAll(name);
+				addresses = Api.getAddressesByAccount(name).split(",");
+				transactions = Constants.getTransactionsByAccount(name);
+				
+				if(updateTimer.timeLimit <= 10000) updateTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+				updateTimer.reset();
+				forceUpdate = false;
+				reloadComplete = true;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 	

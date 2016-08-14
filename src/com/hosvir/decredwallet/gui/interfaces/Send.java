@@ -132,11 +132,6 @@ public class Send extends Interface {
 									to, 
 									getComponentByName("comment").text, 
 									getComponentByName("amount").text);
-							
-							//Show dialog
-							//this.blockInput = true;
-							//Constants.navbar.blockInput = true;
-							//getComponentByName("errordiag").selectedId = 0;
 						}else {
 							txId = Api.sendFrom(getComponentByName("from").text, 
 									to, 

@@ -41,7 +41,7 @@ public class Receive extends Interface implements MouseWheelListener {
 		this.components.add(new Button("new", Constants.getLangValue("Get-New-Button-Text"), Engine.getWidth() - 150, 200, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
 		this.components.add(new Dialog("newaddr", Constants.getLangValue("New-Address-Message")));
 		
-		scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2);
+		scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 		
 		Main.canvas.addMouseWheelListener(this);
 	}
@@ -136,25 +136,25 @@ public class Receive extends Interface implements MouseWheelListener {
 				320, 
 				180, 
 				10,
-				Engine.getHeight() - 230,
+				Engine.getHeight() - 260,
 				null);
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(330, 
 				180, 
 				Engine.getWidth() - 360, 
-				Engine.getHeight() - 230);
+				Engine.getHeight() - 260);
 		
 		g.drawImage(Images.getInterfaces()[7], 
 				Engine.getWidth() - 30, 
 				180, 
 				10,
-				Engine.getHeight() - 230,
+				Engine.getHeight() - 260,
 				null);
 		
 		g.drawImage(Images.getInterfaces()[19], 
 				324, 
-				Engine.getHeight() - 60, 
+				Engine.getHeight() - 90, 
 				Engine.getWidth() - 348,
 				60,
 				null);
@@ -165,7 +165,7 @@ public class Receive extends Interface implements MouseWheelListener {
 		g.setFont(FontConstants.addressFont);
 		
 		for(int i = 0; i < Constants.accounts.get(selectedId).addresses.length; i++) {
-			if(215 + i*30 - scrollOffset < Engine.getHeight() - 40 && 215 + i*30 - scrollOffset > 200) {
+			if(215 + i*30 - scrollOffset < Engine.getHeight() - 70 && 215 + i*30 - scrollOffset > 200) {
 				if(receiveHoverId == i) g.setColor(ColorConstants.flatBlue); else g.setColor(ColorConstants.walletBalanceColor);
 				
 				g.drawString(Constants.accounts.get(selectedId).addresses[i], 340, 215 + i*30 - scrollOffset);
@@ -303,7 +303,7 @@ public class Receive extends Interface implements MouseWheelListener {
 			if(scrollOffset > (Constants.accounts.get(selectedId).addresses.length-1)*30) scrollOffset = (Constants.accounts.get(selectedId).addresses.length-1)*30;
 			
 			if(Constants.accounts.get(selectedId).addresses.length > 0){
-				scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2);
+				scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 				if(scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
 				if(scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
 			}

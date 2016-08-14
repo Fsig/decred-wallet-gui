@@ -20,7 +20,7 @@ public class LinkLabel extends Component {
 	 * @param y
 	 */
 	public LinkLabel(String name, String text, String linkAddress, int x, int y) {
-		super(name, text, 1, x, y, 0, 0);
+		super(name, text, 6, x, y, 0, 0);
 		this.linkAddress = linkAddress;
 		
 		this.rectangles = new Rectangle[1];

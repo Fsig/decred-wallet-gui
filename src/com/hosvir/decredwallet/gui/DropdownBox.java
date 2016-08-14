@@ -32,7 +32,7 @@ public class DropdownBox extends Component implements KeyListener {
 	 * @param lineItems
 	 */
 	public DropdownBox(String name, int x, int y, int width, int height, String[] lineItems) {
-		super(name, "", 3, x, y, width, height);
+		super(name, "", 5, x, y, width, height);
 		this.textColor = ColorConstants.labelColor;
 		this.textFont = FontConstants.settingsFont;
 		

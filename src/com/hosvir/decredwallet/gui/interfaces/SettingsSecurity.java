@@ -37,7 +37,7 @@ public class SettingsSecurity extends Interface {
 		newPassphraseInput.textHidden = true;
 		confirmPassphraseInput.textHidden = true;
 		
-		Button dumpButton = new Button("dumpWallet", "Dump wallet", Engine.getWidth() - 190, Engine.getHeight() - 105, 150, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover);
+		Button dumpButton = new Button("dumpWallet", "Dump wallet", Engine.getWidth() - 190, Engine.getHeight() - 130, 150, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover);
 		dumpButton.enabled = false;
 		
 		this.components.add(oldPassphraseInput);
@@ -46,7 +46,7 @@ public class SettingsSecurity extends Interface {
 		this.components.add(new InputBox("addressInput", 250,170,Engine.getWidth() - 520,30));
 		this.components.add(new Button("dumpPrivateKey", Constants.getLangValue("Dump-Private-Key-Button-Text"), Engine.getWidth() - 240, 170, 200, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
 		this.components.add(new Button("changePassphrase", Constants.getLangValue("Change-Passphrase-Button-Text"), Engine.getWidth() - 240, 410, 200, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
-		this.components.add(new Button("getMasterPublicKey", Constants.getLangValue("Get-Master-Public-Key-Button-Text"), 40, Engine.getHeight() - 105, 220, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+		this.components.add(new Button("getMasterPublicKey", Constants.getLangValue("Get-Master-Public-Key-Button-Text"), 40, Engine.getHeight() - 130, 220, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
 		this.components.add(dumpButton);
 		this.components.add(new Dialog("errordiag", ""));
 		
@@ -172,25 +172,25 @@ public class SettingsSecurity extends Interface {
 				20, 
 				150, 
 				10,
-				Engine.getHeight() - 200,
+				Engine.getHeight() - 230,
 				null);
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(30, 
 				150, 
 				Engine.getWidth() - 60, 
-				Engine.getHeight() - 200);
+				Engine.getHeight() - 230);
 		
 		g.drawImage(Images.getInterfaces()[7], 
 				Engine.getWidth() - 30, 
 				150, 
 				10,
-				Engine.getHeight() - 200,
+				Engine.getHeight() - 230,
 				null);
 		
 		g.drawImage(Images.getInterfaces()[19], 
 				24, 
-				Engine.getHeight() - 60, 
+				Engine.getHeight() - 90, 
 				Engine.getWidth() - 48,
 				60,
 				null);
@@ -215,8 +215,8 @@ public class SettingsSecurity extends Interface {
 		getComponentByName("dumpPrivateKey").x = Engine.getWidth() - 240;
 		getComponentByName("changePassphrase").x = Engine.getWidth() - 240;
 		getComponentByName("dumpWallet").x = Engine.getWidth() - 190;
-		getComponentByName("getMasterPublicKey").y = Engine.getHeight() - 105;
-		getComponentByName("dumpWallet").y = Engine.getHeight() - 105;
+		getComponentByName("getMasterPublicKey").y = Engine.getHeight() - 130;
+		getComponentByName("dumpWallet").y = Engine.getHeight() - 130;
 		
 		super.resize();
 	}
