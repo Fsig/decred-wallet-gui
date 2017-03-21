@@ -1,61 +1,60 @@
 package com.hosvir.decredwallet;
 
 /**
- * 
- * @author Troy
- *
+ * @author fsig
+ * @version 1.00
+ * @since 19/03/17
  */
 public class Contact {
-	private int id;
-	private String name;
-	private String email;
-	private String address;
-	
-	/**
-	 * Construct a new contact.
-	 * 
-	 * @param id
-	 * @param name
-	 * @param email
-	 * @param address
-	 */
-	public Contact(int id, String name, String email, String address) {
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.address = address;
-	}
+    private int id;
+    private String name;
+    private String email;
+    private String address;
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * Construct a new contact.
+     *
+     * @param id
+     * @param name
+     * @param email
+     * @param address
+     */
+    public Contact(int id, String name, String email, String address) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.address = address;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
-	
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

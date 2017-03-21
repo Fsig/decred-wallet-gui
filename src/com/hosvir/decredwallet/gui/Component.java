@@ -1,177 +1,175 @@
 package com.hosvir.decredwallet.gui;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 
 /**
- * 
- * @author Troy
- *
+ * @author fsig
+ * @version 1.00
+ * @since 19/03/17
  */
 public abstract class Component extends BaseGui {
-	public String name;
-	public String text;
-	public String placeholderText;
-	public int id;
-	public int x;
-	public int y;
-	public int width;
-	public int height;
-	public boolean enabled;
-	public boolean textHidden;
-	public Color textColor;
-	public Color borderColor;
-	public Color hoverColor;
-	public Color disabledColor;
-	public Font textFont;
-	
-	/**
-	 * Construct a new component.
-	 * 
-	 * @param name
-	 * @param text
-	 * @param id
-	 * @param x
-	 * @param y
-	 * @param width
-	 * @param height
-	 */
-	public Component(String name, String text, int id, int x, int y, int width, int height) {
-		this.name = name;
-		this.text = text;
-		this.id = id;
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		
-		this.enabled = true;
-		this.textHidden = false;
-		this.textColor = ColorConstants.labelColor;
-		this.borderColor = ColorConstants.settingsSelectedColor;
-		this.hoverColor = ColorConstants.flatBlue;
-		this.disabledColor = ColorConstants.settingsSelectedColor;
-		this.textFont = FontConstants.labelFont;
-	}
-	
-	@Override
-	public void update(long delta) {
-		if(enabled) super.update(delta);
-	}
-	
-	@Override
-	public void resize() {}
+    public String name;
+    public String text;
+    public String placeholderText;
+    public int id;
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+    public boolean enabled;
+    public boolean textHidden;
+    public Color textColor;
+    public Color borderColor;
+    public Color hoverColor;
+    public Color disabledColor;
+    public Font textFont;
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * Construct a new component.
+     *
+     * @param name
+     * @param text
+     * @param id
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
+    public Component(String name, String text, int id, int x, int y, int width, int height) {
+        this.name = name;
+        this.text = text;
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+        this.enabled = true;
+        this.textHidden = false;
+        this.textColor = ColorConstants.labelColor;
+        this.borderColor = ColorConstants.settingsSelectedColor;
+        this.hoverColor = ColorConstants.flatBlue;
+        this.disabledColor = ColorConstants.settingsSelectedColor;
+        this.textFont = FontConstants.labelFont;
+    }
 
-	public String getText() {
-		return text;
-	}
+    @Override
+    public void update(long delta) {
+        if(enabled) super.update(delta);
+    }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    @Override
+    public void resize() {}
 
-	public int getId() {
-		return id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public int getX() {
-		return x;
-	}
+    public String getText() {
+        return text;
+    }
 
-	public void setX(int x) {
-		this.x = x;
-	}
+    public void setText(String text) {
+        this.text = text;
+    }
 
-	public int getY() {
-		return y;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setY(int y) {
-		this.y = y;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getX() {
+        return x;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+    public void setX(int x) {
+        this.x = x;
+    }
 
-	public int getHeight() {
-		return height;
-	}
+    public int getY() {
+        return y;
+    }
 
-	public void setHeight(int height) {
-		this.height = height;
-	}
+    public void setY(int y) {
+        this.y = y;
+    }
 
-	public boolean isEnabled() {
-		return enabled;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-	public boolean isTextHidden() {
-		return textHidden;
-	}
+    public int getHeight() {
+        return height;
+    }
 
-	public void setTextHidden(boolean textHidden) {
-		this.textHidden = textHidden;
-	}
+    public void setHeight(int height) {
+        this.height = height;
+    }
 
-	public Color getTextColor() {
-		return textColor;
-	}
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-	public void setTextColor(Color textColor) {
-		this.textColor = textColor;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	public Color getBorderColor() {
-		return borderColor;
-	}
+    public boolean isTextHidden() {
+        return textHidden;
+    }
 
-	public void setBorderColor(Color borderColor) {
-		this.borderColor = borderColor;
-	}
+    public void setTextHidden(boolean textHidden) {
+        this.textHidden = textHidden;
+    }
 
-	public Color getHoverColor() {
-		return hoverColor;
-	}
+    public Color getTextColor() {
+        return textColor;
+    }
 
-	public void setHoverColor(Color hoverColor) {
-		this.hoverColor = hoverColor;
-	}
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
+    }
 
-	public Color getDisabledColor() {
-		return disabledColor;
-	}
+    public Color getBorderColor() {
+        return borderColor;
+    }
 
-	public void setDisabledColor(Color disabledColor) {
-		this.disabledColor = disabledColor;
-	}
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+    }
 
-	public Font getTextFont() {
-		return textFont;
-	}
+    public Color getHoverColor() {
+        return hoverColor;
+    }
 
-	public void setTextFont(Font textFont) {
-		this.textFont = textFont;
-	}
-	
+    public void setHoverColor(Color hoverColor) {
+        this.hoverColor = hoverColor;
+    }
+
+    public Color getDisabledColor() {
+        return disabledColor;
+    }
+
+    public void setDisabledColor(Color disabledColor) {
+        this.disabledColor = disabledColor;
+    }
+
+    public Font getTextFont() {
+        return textFont;
+    }
+
+    public void setTextFont(Font textFont) {
+        this.textFont = textFont;
+    }
 }

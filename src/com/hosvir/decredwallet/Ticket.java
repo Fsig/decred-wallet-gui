@@ -1,100 +1,110 @@
 package com.hosvir.decredwallet;
 
-import java.util.ArrayList;
-
-import com.hosvir.decredwallet.utils.JsonObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
- * 
- * @author Troy
- *
+ * @author fsig
+ * @version 1.00
+ * @since 19/03/17
  */
 public class Ticket {
-	private String ticketHash;
-	private String address;
-	private int voteBits;
-	private String amount;
-	private String fee;
-	private int confirmations;
-	private int block;
-	private String time;
-	private String blockHash;
-	private int blockHeight;
-	private boolean live;
-	
-	public Ticket(String ticketHash) {
-		this.ticketHash = ticketHash;
-		
-		//Get the transaction details
-		ArrayList<JsonObject> transaction = Api.getTransaction(ticketHash);
-		
-		this.amount = transaction.get(0).getValueByName("amount");
-		this.fee = transaction.get(0).getValueByName("fee");
-		
-		try{
-			this.confirmations = Integer.valueOf(transaction.get(0).getValueByName("confirmations"));
-		}catch(Exception e){
-			this.confirmations = -1;
-		}
-		
-		this.blockHash = transaction.get(0).getValueByName("blockhash");
-		this.time = transaction.get(0).getValueByName("time");
-		this.voteBits = Integer.valueOf(transaction.get(0).getValueByName("vout"));
-		this.address = transaction.get(1).getValueByName("address");
-		
-		JsonObject block = Api.getBlock(blockHash);
-		
-		try{
-			this.blockHeight = Integer.valueOf(block.getValueByName("height"));
-		}catch(Exception e){
-			this.blockHeight = -1;
-		}
-		
-		this.live = Boolean.valueOf(Api.existsLiveTicket(ticketHash));
-	}
+    private String ticketHash;
+    private String address;
+    private int voteBits;
+    private String amount;
+    private String fee;
+    private int confirmations;
+    private int block;
+    private String time;
+    private String blockHash;
+    private int blockHeight;
+    private boolean live;
 
-	public String getTicketHash() {
-		return ticketHash;
-	}
+    public Ticket(String ticketHash) {
+        this.ticketHash = ticketHash;
 
-	public String getAddress() {
-		return address;
-	}
+        //Get the transaction details
+        JSONObject transaction = Api.getTransaction(ticketHash);
+        JSONObject detail = null;
 
-	public int getVoteBits() {
-		return voteBits;
-	}
+        try {
+            JSONArray details = (JSONArray) transaction.get("details");
+            detail = (JSONObject) details.get(0);
+        } catch (NullPointerException e) {
+            //Nothing to do...
+        }
 
-	public String getAmount() {
-		return amount;
-	}
+        this.amount = transaction.get("amount").toString();
+        this.fee = transaction.get("fee").toString();
 
-	public String getFee() {
-		return fee;
-	}
+        try{
+            this.confirmations = Integer.valueOf(transaction.get("confirmations").toString());
+        }catch(Exception e){
+            this.confirmations = -1;
+        }
 
-	public int getConfirmations() {
-		return confirmations;
-	}
+        this.blockHash = transaction.get("blockhash").toString();
+        this.time = transaction.get("time").toString();
 
-	public int getBlock() {
-		return block;
-	}
+        if (detail != null) {
+            this.voteBits = Integer.valueOf(detail.get("vout").toString());
+        }
 
-	public String getTime() {
-		return time;
-	}
+        this.address = String.valueOf(transaction.get("address"));
 
-	public String getBlockHash() {
-		return blockHash;
-	}
+        JSONObject block = Api.getBlock(blockHash);
 
-	public int getBlockHeight() {
-		return blockHeight;
-	}
-	
-	public boolean isLive() {
-		return live;
-	}
+        try{
+            this.blockHeight = Integer.valueOf(block.get("height").toString());
+        }catch(Exception e){
+            this.blockHeight = -1;
+        }
 
+        this.live = Api.existsLiveTicket(ticketHash);
+    }
+
+    public String getTicketHash() {
+        return ticketHash;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public int getVoteBits() {
+        return voteBits;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public String getFee() {
+        return fee;
+    }
+
+    public int getConfirmations() {
+        return confirmations;
+    }
+
+    public int getBlock() {
+        return block;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public String getBlockHash() {
+        return blockHash;
+    }
+
+    public int getBlockHeight() {
+        return blockHeight;
+    }
+
+    public boolean isLive() {
+        return live;
+    }
 }
