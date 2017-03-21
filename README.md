@@ -5,7 +5,7 @@ All components are made using Graphics2D and images where required, this gives u
 Calls to DCRD and DCRWALLET are made via RPC, if the specified address is localhost the GUI will start the DCRD and DCRWALLET process if they are not already running.
 Certificates are stored within a custom Keystore with a generated password that is added to your settings.conf.
 
-####Index:
+#### Index:
 * [Downloads](#download-binaries)  
 * [Features](#features)
 * [Build and install on Linux](#build-and-install-on-linux)
