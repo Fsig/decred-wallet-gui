@@ -33,16 +33,16 @@ public class FileUtils {
         try {
             stream = FileUtils.class.getResourceAsStream(name);
 
-            if(stream == null) {
+            if (stream == null) {
                 throw new Exception("Cannot get resource " + name + " from Jar file.");
             }
 
             outFile = new File(destination + File.separator + name.replaceAll("/resources/lang/", ""));
-            if(outFile.exists()) outFile.createNewFile();
+            if (outFile.exists()) outFile.createNewFile();
 
             resStreamOut = new FileOutputStream(outFile.getAbsolutePath());
 
-            while((readBytes = stream.read(buffer)) > 0) {
+            while ((readBytes = stream.read(buffer)) > 0) {
                 resStreamOut.write(buffer, 0, readBytes);
             }
 
@@ -50,7 +50,7 @@ public class FileUtils {
             resStreamOut.close();
 
             return true;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

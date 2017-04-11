@@ -12,13 +12,13 @@ import java.util.ArrayList;
  * @since 19/03/17
  */
 public class LocalProcess extends Thread {
+    public ArrayList<String> log;
     private boolean running;
     private Process process;
     private BufferedReader stdInput;
     private PrintWriter stdOut;
     private String command;
     private String line;
-    public ArrayList<String> log;
     private String[] commands;
 
     /**
@@ -33,13 +33,13 @@ public class LocalProcess extends Thread {
     }
 
     public void run() {
-        try{
+        try {
             running = true;
 
-            if(Constants.isOsLinux()){
-                commands = new String[]{"/bin/sh","-c", command};
-            }else if(Constants.isOsWindows()){
-                commands = new String[]{"cmd","/c", command};
+            if (Constants.isOsLinux()) {
+                commands = new String[]{"/bin/sh", "-c", command};
+            } else if (Constants.isOsWindows()) {
+                commands = new String[]{"cmd", "/c", command};
             }
 
             process = new ProcessBuilder(commands).start();
@@ -49,15 +49,16 @@ public class LocalProcess extends Thread {
             line = null;
 
             //While running
-            while(running && (line = stdInput.readLine()) != null){
+            while (running && (line = stdInput.readLine()) != null) {
 
                 //Save output
                 log.add(line);
-                if(Constants.guiInterfaces != null && Constants.guiInterfaces.size() > 5) Constants.guiInterfaces.get(5).resize();
+                if (Constants.guiInterfaces != null && Constants.guiInterfaces.size() > 5)
+                    Constants.guiInterfaces.get(5).resize();
 
                 try {
                     Thread.sleep(50);
-                }catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     System.out.println("Error sleeping?");
                     e.printStackTrace();
                 }
@@ -67,7 +68,7 @@ public class LocalProcess extends Thread {
             stdOut.flush();
             stdOut.close();
             process.destroy();
-        }catch(IOException e){
+        } catch (IOException e) {
             running = false;
             stdOut.flush();
             stdOut.close();
@@ -78,12 +79,12 @@ public class LocalProcess extends Thread {
         running = false;
     }
 
-    public void killProcess(){
-        try{
-            stdOut.write((char)3);
+    public void killProcess() {
+        try {
+            stdOut.write((char) 3);
             stdOut.flush();
             running = false;
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

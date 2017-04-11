@@ -1,9 +1,9 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
-import com.hosvir.decredwallet.Constants;
-import com.hosvir.decredwallet.gui.*;
 import com.deadendgine.Engine;
 import com.deadendgine.input.Mouse;
+import com.hosvir.decredwallet.Constants;
+import com.hosvir.decredwallet.gui.*;
 import com.hosvir.decredwallet.gui.Dialog;
 
 import java.awt.*;
@@ -31,8 +31,8 @@ public class Staking extends Interface implements MouseWheelListener {
     @Override
     public void init() {
         rectangles = new Rectangle[3];
-        for(int i = 0; i < rectangles.length; i++){
-            rectangles[i] = new Rectangle(i*170,60,170,70);
+        for (int i = 0; i < rectangles.length; i++) {
+            rectangles[i] = new Rectangle(i * 170, 60, 170, 70);
         }
 
         this.components.add(new Dialog("errordiag", ""));
@@ -49,29 +49,29 @@ public class Staking extends Interface implements MouseWheelListener {
     public void update(long delta) {
         super.update(delta);
 
-        if(rectangles == null){
+        if (rectangles == null) {
             rectangles = new Rectangle[3];
-            for(int i = 0; i < rectangles.length; i++){
-                rectangles[i] = new Rectangle(i*170,60,170,70);
+            for (int i = 0; i < rectangles.length; i++) {
+                rectangles[i] = new Rectangle(i * 170, 60, 170, 70);
             }
         }
 
         //Ticket hash rectangles
-        if(txRectangles == null && Constants.globalCache.tickets.size() > 0){
+        if (txRectangles == null && Constants.globalCache.tickets.size() > 0) {
             txRectangles = new Rectangle[Constants.globalCache.tickets.size()];
 
-            for(int i = 0; i < txRectangles.length; i++){
-                txRectangles[i] = new Rectangle((Engine.getWidth() / 2) - 150, 250 + i*70 - scrollOffset, 450,20);
+            for (int i = 0; i < txRectangles.length; i++) {
+                txRectangles[i] = new Rectangle((Engine.getWidth() / 2) - 150, 250 + i * 70 - scrollOffset, 450, 20);
             }
         }
 
-        if(txRectangles != null){
-            for(int i = 0; i < txRectangles.length; i++){
-                if(txRectangles[i] != null && txRectangles[i].contains(Mouse.point)){
+        if (txRectangles != null) {
+            for (int i = 0; i < txRectangles.length; i++) {
+                if (txRectangles[i] != null && txRectangles[i].contains(Mouse.point)) {
                     containsMouse = true;
                     txHoverId = i;
 
-                    if(Mouse.isMouseDown(MouseEvent.BUTTON1)){
+                    if (Mouse.isMouseDown(MouseEvent.BUTTON1)) {
                         Constants.setClipboardString(Constants.globalCache.tickets.get(txHoverId).getTicketHash().trim());
                         getComponentByName("errordiag").text = Constants.getLangValue("Clipboard-Message") + ": " + Constants.getClipboardString();
 
@@ -85,26 +85,26 @@ public class Staking extends Interface implements MouseWheelListener {
                 }
             }
 
-            if(!containsMouse) txHoverId = -1;
+            if (!containsMouse) txHoverId = -1;
         }
 
 
         //Vote bit rectangles
-        if(vbRectangles == null && Constants.globalCache.tickets.size() > 0){
+        if (vbRectangles == null && Constants.globalCache.tickets.size() > 0) {
             vbRectangles = new Rectangle[Constants.globalCache.tickets.size()];
 
-            for(int i = 0; i < vbRectangles.length; i++){
-                vbRectangles[i] = new Rectangle(Engine.getWidth() - 245, 235 + i*70 - scrollOffset, 30,20);
+            for (int i = 0; i < vbRectangles.length; i++) {
+                vbRectangles[i] = new Rectangle(Engine.getWidth() - 245, 235 + i * 70 - scrollOffset, 30, 20);
             }
         }
 
-        if(vbRectangles != null){
-            for(int i = 0; i < vbRectangles.length; i++){
-                if(vbRectangles[i] != null && vbRectangles[i].contains(Mouse.point)){
+        if (vbRectangles != null) {
+            for (int i = 0; i < vbRectangles.length; i++) {
+                if (vbRectangles[i] != null && vbRectangles[i].contains(Mouse.point)) {
                     containsMouse = true;
                     vbHoverId = i;
 
-                    if(Mouse.isMouseDown(MouseEvent.BUTTON1)){
+                    if (Mouse.isMouseDown(MouseEvent.BUTTON1)) {
                         //Constants.log("Changing vote bits on: ");
                         //Constants.setClipboardString(Constants.globalCache.tickets.get(txHoverId).getTicketHash().trim());
                         getComponentByName("errordiag").text = Constants.getLangValue("Error") + " " + Constants.getLangValue("Ticket-Votebit-Change-Message");
@@ -119,7 +119,7 @@ public class Staking extends Interface implements MouseWheelListener {
                 }
             }
 
-            if(!containsMouse) vbHoverId = -1;
+            if (!containsMouse) vbHoverId = -1;
         }
     }
 
@@ -139,10 +139,10 @@ public class Staking extends Interface implements MouseWheelListener {
                 60,
                 null);
 
-        for(int i = 0; i < rectangles.length; i++){
+        for (int i = 0; i < rectangles.length; i++) {
             g.setColor(ColorConstants.settingsSelectedColor);
 
-            if(selectedId == i || hoverId == i){
+            if (selectedId == i || hoverId == i) {
                 g.fillRect(rectangles[i].x,
                         rectangles[i].y,
                         rectangles[i].width,
@@ -161,49 +161,49 @@ public class Staking extends Interface implements MouseWheelListener {
         g.drawString(Constants.getLangValue("Purchase-Button-Text"), (170 * 2) - 85 - (g.getFontMetrics().stringWidth(Constants.getLangValue("Purchase-Button-Text")) / 2), 105);
         g.drawString(Constants.getLangValue("Pool-Button-Text"), (170 * 3) - 85 - (g.getFontMetrics().stringWidth(Constants.getLangValue("Pool-Button-Text")) / 2), 105);
 
-        switch(selectedId){
+        switch (selectedId) {
             case 0: //Statistics
                 //Tickets
-                if(Constants.globalCache.tickets != null){
-                    for(int i = 0; i < Constants.globalCache.tickets.size(); i++){
-                        if(220 + i*70 - scrollOffset < Engine.getHeight() && 220 + i*70 - scrollOffset > 80 && Constants.globalCache.tickets.get(i) != null){
+                if (Constants.globalCache.tickets != null) {
+                    for (int i = 0; i < Constants.globalCache.tickets.size(); i++) {
+                        if (220 + i * 70 - scrollOffset < Engine.getHeight() && 220 + i * 70 - scrollOffset > 80 && Constants.globalCache.tickets.get(i) != null) {
                             g.drawImage(Images.getInterfaces()[6],
                                     16,
-                                    220 + i*70 - scrollOffset,
+                                    220 + i * 70 - scrollOffset,
                                     10,
                                     50,
                                     null);
 
                             g.setColor(Color.WHITE);
                             g.fillRect(20,
-                                    220 + i*70 - scrollOffset,
+                                    220 + i * 70 - scrollOffset,
                                     Engine.getWidth() - 45,
                                     45);
 
                             g.drawImage(Images.getInterfaces()[7],
                                     Engine.getWidth() - 25,
-                                    220 + i*70 - scrollOffset,
+                                    220 + i * 70 - scrollOffset,
                                     10,
                                     50,
                                     null);
 
                             g.drawImage(Images.getInterfaces()[19],
                                     20,
-                                    220 + i*70 - scrollOffset + 41,
+                                    220 + i * 70 - scrollOffset + 41,
                                     Engine.getWidth() - 39,
                                     50,
                                     null);
 
 
                             //Live or not
-                            if(Constants.globalCache.tickets.get(i).isLive()) {
+                            if (Constants.globalCache.tickets.get(i).isLive()) {
                                 g.setColor(ColorConstants.flatGreen);
-                            }else {
+                            } else {
                                 g.setColor(ColorConstants.flatRed);
                             }
 
                             g.fillRect(20,
-                                    220 + i*70 - scrollOffset,
+                                    220 + i * 70 - scrollOffset,
                                     5,
                                     50);
 
@@ -212,23 +212,23 @@ public class Staking extends Interface implements MouseWheelListener {
                             dateString = Constants.getWalletDate(Long.parseLong(Constants.globalCache.tickets.get(i).getTime())).split(":");
                             g.setColor(ColorConstants.walletBalanceColor);
                             g.setFont(FontConstants.walletBalanceFont);
-                            g.drawString(dateString[0], 35, 252 + i*70 - scrollOffset);
+                            g.drawString(dateString[0], 35, 252 + i * 70 - scrollOffset);
 
                             g.setColor(ColorConstants.labelColor);
                             g.setFont(FontConstants.transactionFont);
-                            g.drawString(dateString[1].replaceAll("!", ":"), 27, 266 + i*70 - scrollOffset);
+                            g.drawString(dateString[1].replaceAll("!", ":"), 27, 266 + i * 70 - scrollOffset);
 
                             //Draw confirmations
-                            g.drawString(Constants.globalCache.tickets.get(i).getConfirmations() + "", 27, 236 + i*70 - scrollOffset);
+                            g.drawString(Constants.globalCache.tickets.get(i).getConfirmations() + "", 27, 236 + i * 70 - scrollOffset);
 
                             //Draw block
                             g.setColor(ColorConstants.labelColor);
                             g.setFont(FontConstants.transactionFont);
-                            g.drawString(Constants.getLangValue("Block-Label"), 190, 235 + i*70 - scrollOffset);
+                            g.drawString(Constants.getLangValue("Block-Label"), 190, 235 + i * 70 - scrollOffset);
 
                             g.setColor(ColorConstants.walletBalanceColor);
                             g.setFont(FontConstants.walletBalanceFont);
-                            g.drawString(Constants.globalCache.tickets.get(i).getBlockHeight() + "", 180, 252 + i*70 - scrollOffset);
+                            g.drawString(Constants.globalCache.tickets.get(i).getBlockHeight() + "", 180, 252 + i * 70 - scrollOffset);
 
                             //Draw address
                             if (Constants.globalCache.tickets.get(i).getAddress() != null) {
@@ -238,35 +238,36 @@ public class Staking extends Interface implements MouseWheelListener {
                             }
 
                             //Draw transaction
-                            if(txHoverId == i) g.setColor(ColorConstants.flatBlue); else g.setColor(ColorConstants.labelColor);
+                            if (txHoverId == i) g.setColor(ColorConstants.flatBlue);
+                            else g.setColor(ColorConstants.labelColor);
                             g.setFont(FontConstants.transactionFont);
                             g.drawString(Constants.globalCache.tickets.get(i).getTicketHash(),
                                     (Engine.getWidth() / 2) - (g.getFontMetrics().stringWidth(Constants.globalCache.tickets.get(i).getTicketHash()) / 2),
-                                    266 + i*70 - scrollOffset);
+                                    266 + i * 70 - scrollOffset);
 
 
                             //Draw vout
                             g.setColor(ColorConstants.labelColor);
                             g.setFont(FontConstants.transactionFont);
-                            g.drawString(Constants.getLangValue("Votebits-Label"), Engine.getWidth() - 255, 235 + i*70 - scrollOffset);
+                            g.drawString(Constants.getLangValue("Votebits-Label"), Engine.getWidth() - 255, 235 + i * 70 - scrollOffset);
 
-                            if(vbHoverId == i) g.setColor(ColorConstants.flatBlue); else g.setColor(ColorConstants.walletBalanceColor);
+                            if (vbHoverId == i) g.setColor(ColorConstants.flatBlue);
+                            else g.setColor(ColorConstants.walletBalanceColor);
                             g.setFont(FontConstants.walletBalanceFont);
-                            g.drawString(Constants.globalCache.tickets.get(i).getVoteBits() + "", Engine.getWidth() - 235, 252 + i*70 - scrollOffset);
+                            g.drawString(Constants.globalCache.tickets.get(i).getVoteBits() + "", Engine.getWidth() - 235, 252 + i * 70 - scrollOffset);
 
                             //Draw amount
                             g.setColor(ColorConstants.walletBalanceColor);
                             g.setFont(FontConstants.walletBalanceFont);
-                            g.drawString(Constants.globalCache.tickets.get(i).getAmount().replace("-", "- "), (Engine.getWidth() - 30 - g.getFontMetrics().stringWidth(Constants.globalCache.tickets.get(i).getAmount().replace("-", "- "))), 252 + i*70 - scrollOffset);
+                            g.drawString(Constants.globalCache.tickets.get(i).getAmount().replace("-", "- "), (Engine.getWidth() - 30 - g.getFontMetrics().stringWidth(Constants.globalCache.tickets.get(i).getAmount().replace("-", "- "))), 252 + i * 70 - scrollOffset);
 
                             //Draw tx fee
                             g.setColor(ColorConstants.labelColor);
                             g.setFont(FontConstants.transactionFont);
-                            g.drawString(Constants.globalCache.tickets.get(i).getFee().replace("-", "- "), (Engine.getWidth() - 30 - g.getFontMetrics().stringWidth(Constants.globalCache.tickets.get(i).getFee().replace("-", "- "))), 266 + i*70 - scrollOffset);
+                            g.drawString(Constants.globalCache.tickets.get(i).getFee().replace("-", "- "), (Engine.getWidth() - 30 - g.getFontMetrics().stringWidth(Constants.globalCache.tickets.get(i).getFee().replace("-", "- "))), 266 + i * 70 - scrollOffset);
                         }
                     }
                 }
-
 
 
                 //Content box
@@ -313,7 +314,7 @@ public class Staking extends Interface implements MouseWheelListener {
                 g.drawString(Constants.getLangValue("Missed-Label"), (headerThird * 8) - (headerThird / 2) - (g.getFontMetrics().stringWidth(Constants.getLangValue("Missed-Label")) / 2), 170);
                 g.drawString(Constants.getLangValue("Revoked-Label"), (headerThird * 9) - (headerThird / 2) - (g.getFontMetrics().stringWidth(Constants.getLangValue("Revoked-Label")) / 2), 170);
 
-                if(Constants.globalCache.stakeInfo != null && Constants.globalCache.stakeInfo.size() > 0 && Constants.globalCache.stakeInfo.get("poolsize") != null){
+                if (Constants.globalCache.stakeInfo != null && Constants.globalCache.stakeInfo.size() > 0 && Constants.globalCache.stakeInfo.get("poolsize") != null) {
                     g.setColor(ColorConstants.walletBalanceColor);
                     g.setFont(FontConstants.walletBalanceFont);
                     g.drawString(String.valueOf(Constants.globalCache.stakeInfo.get("poolsize")), headerThird - (headerThird / 2) - (g.getFontMetrics().stringWidth(String.valueOf(Constants.globalCache.stakeInfo.get("poolsize"))) / 2), 190);
@@ -331,7 +332,7 @@ public class Staking extends Interface implements MouseWheelListener {
 
 
                 //Scroll bar
-                if(Constants.globalCache.tickets.size() > 0) {
+                if (Constants.globalCache.tickets.size() > 0) {
                     g.setColor(Color.LIGHT_GRAY);
                     g.drawLine(Engine.getWidth() - 10, 130, Engine.getWidth() - 10, Engine.getHeight());
                     g.fillRect(Engine.getWidth() - 10, scrollCurrentPosition, 10, 60);
@@ -365,24 +366,27 @@ public class Staking extends Interface implements MouseWheelListener {
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if(isActive()){
-            if(e.getUnitsToScroll() > 0){
+        if (isActive()) {
+            if (e.getUnitsToScroll() > 0) {
                 scrollOffset += 70;
-                if(Constants.globalCache.tickets.size() > 0)
-                    scrollCurrentPosition += (Engine.getHeight() - scrollMinHeight - 60) / Constants.globalCache.tickets.size();
-            }else{
+                if (Constants.globalCache.tickets.size() > 0) {
+                    scrollCurrentPosition += (Engine.getHeight() - scrollMinHeight - 60) / (Constants.globalCache.tickets.size() - 1);
+                }
+            } else {
                 scrollOffset -= 70;
-                if(Constants.globalCache.tickets.size() > 0)
-                    scrollCurrentPosition -= (Engine.getHeight() - scrollMinHeight - 60) / Constants.globalCache.tickets.size();
+                if (Constants.globalCache.tickets.size() > 0) {
+                    scrollCurrentPosition -= (Engine.getHeight() - scrollMinHeight - 60) / (Constants.globalCache.tickets.size() - 1);
+                }
             }
 
-            if(scrollOffset < 0) scrollOffset = 0;
-            if(scrollOffset > Constants.globalCache.tickets.size() *70) scrollOffset = Constants.globalCache.tickets.size() *70;
+            if (scrollOffset < 0) scrollOffset = 0;
+            if (scrollOffset > (Constants.globalCache.tickets.size() - 1) * 70)
+                scrollOffset = (Constants.globalCache.tickets.size() - 1) * 70;
 
-            if(Constants.globalCache.tickets.size() > 0){
+            if (Constants.globalCache.tickets.size() > 0) {
                 scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
-                if(scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
-                if(scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
+                if (scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
+                if (scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
             }
 
             txRectangles = null;

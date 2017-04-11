@@ -32,15 +32,24 @@ public class Ticket {
             JSONArray details = (JSONArray) transaction.get("details");
             detail = (JSONObject) details.get(0);
         } catch (NullPointerException e) {
-            //Nothing to do...
+            this.amount = "0";
+            this.fee = "0";
+            this.confirmations = 0;
+            this.blockHash = "";
+            this.time = "00000000";
+            this.voteBits = 0;
+            this.address = "";
+            this.blockHeight = 0;
+            this.live = false;
+            return;
         }
 
         this.amount = transaction.get("amount").toString();
         this.fee = transaction.get("fee").toString();
 
-        try{
+        try {
             this.confirmations = Integer.valueOf(transaction.get("confirmations").toString());
-        }catch(Exception e){
+        } catch (Exception e) {
             this.confirmations = -1;
         }
 
@@ -55,9 +64,9 @@ public class Ticket {
 
         JSONObject block = Api.getBlock(blockHash);
 
-        try{
+        try {
             this.blockHeight = Integer.valueOf(block.get("height").toString());
-        }catch(Exception e){
+        } catch (Exception e) {
             this.blockHeight = -1;
         }
 

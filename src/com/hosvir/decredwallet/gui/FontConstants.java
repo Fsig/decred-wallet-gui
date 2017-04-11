@@ -37,7 +37,7 @@ public class FontConstants {
             transactionFont = new Font("SourceSansPro-Regular", Font.PLAIN, 12);
             settingsFont = new Font("SourceSansPro-Bold", Font.BOLD, 14);
             tabFont = new Font("SourceSansPro-Bold", Font.BOLD, 20);
-        } catch (IOException|FontFormatException e) {
+        } catch (IOException | FontFormatException e) {
             System.out.println("Failed to load fonts, switching to defaults.");
             e.printStackTrace();
         }

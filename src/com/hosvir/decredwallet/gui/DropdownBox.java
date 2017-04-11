@@ -1,9 +1,9 @@
 package com.hosvir.decredwallet.gui;
 
-import com.hosvir.decredwallet.Constants;
 import com.deadendgine.input.Keyboard;
 import com.deadendgine.input.Mouse;
 import com.deadendgine.utils.StringUtils;
+import com.hosvir.decredwallet.Constants;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -35,16 +35,16 @@ public class DropdownBox extends Component implements KeyListener {
         this.textFont = FontConstants.settingsFont;
 
         this.rectangles = new Rectangle[1];
-        this.rectangles[0] = new Rectangle(x,y,width,height);
+        this.rectangles[0] = new Rectangle(x, y, width, height);
 
         this.selectedId = -1;
         this.lineItems = lineItems;
 
-        if(lineItems != null){
+        if (lineItems != null) {
             this.itemRectangles = new Rectangle[lineItems.length];
 
-            for(int i = 0; i < lineItems.length; i++){
-                itemRectangles[i] = new Rectangle(x, y + ((i+1) * height), width, height);
+            for (int i = 0; i < lineItems.length; i++) {
+                itemRectangles[i] = new Rectangle(x, y + ((i + 1) * height), width, height);
             }
         }
 
@@ -53,14 +53,14 @@ public class DropdownBox extends Component implements KeyListener {
 
     @Override
     public void update(long delta) {
-        if(isActive()){
-            if(itemRectangles != null){
-                for(int i = 0; i < itemRectangles.length; i++) {
-                    if(itemRectangles[i].contains(Mouse.point)) {
+        if (isActive()) {
+            if (itemRectangles != null) {
+                for (int i = 0; i < itemRectangles.length; i++) {
+                    if (itemRectangles[i].contains(Mouse.point)) {
                         containsMouse = true;
                         hoverItem = i;
 
-                        if(Mouse.isMouseDown(MouseEvent.BUTTON1)) {
+                        if (Mouse.isMouseDown(MouseEvent.BUTTON1)) {
                             text = lineItems[i];
                             selectedItem = i;
                             selectedId = -1;
@@ -68,11 +68,11 @@ public class DropdownBox extends Component implements KeyListener {
                         }
                     }
                 }
-            }else if(lineItems != null && itemRectangles == null){
+            } else if (lineItems != null && itemRectangles == null) {
                 this.itemRectangles = new Rectangle[lineItems.length];
 
-                for(int i = 0; i < lineItems.length; i++){
-                    itemRectangles[i] = new Rectangle(x, y + ((i+1) * height), width, height);
+                for (int i = 0; i < lineItems.length; i++) {
+                    itemRectangles[i] = new Rectangle(x, y + ((i + 1) * height), width, height);
                 }
             }
         }
@@ -83,7 +83,7 @@ public class DropdownBox extends Component implements KeyListener {
     @Override
     public void render(Graphics2D g) {
         //Draw line items
-        if(selectedId == 0){
+        if (selectedId == 0) {
             g.setColor(Color.WHITE);
             g.fillRect(x,
                     y + height,
@@ -99,11 +99,12 @@ public class DropdownBox extends Component implements KeyListener {
 
 
         //Draw first box
-        if(enabled && hoverId == 0) g.setColor(hoverColor); else g.setColor(borderColor);
+        if (enabled && hoverId == 0) g.setColor(hoverColor);
+        else g.setColor(borderColor);
 
         g.drawRect(x, y, width, height);
 
-        if(!enabled) {
+        if (!enabled) {
             g.setColor(borderColor);
             g.fillRect(x, y, width, height);
         }
@@ -124,16 +125,16 @@ public class DropdownBox extends Component implements KeyListener {
 
 
         //Draw item strings
-        if(selectedId == 0){
+        if (selectedId == 0) {
             //Draw line item strings
             g.setFont(textFont);
 
-            if(lineItems != null){
-                for(int i = 0; i < lineItems.length; i++){
+            if (lineItems != null) {
+                for (int i = 0; i < lineItems.length; i++) {
                     g.setColor(textColor);
-                    g.drawString(lineItems[i].replace(".conf", ""), x + 10, y + (height /2 ) + 8 + ((i+1) * height));
+                    g.drawString(lineItems[i].replace(".conf", ""), x + 10, y + (height / 2) + 8 + ((i + 1) * height));
 
-                    if(enabled && hoverItem == i) {
+                    if (enabled && hoverItem == i) {
                         g.setColor(hoverColor);
                         g.drawRect(itemRectangles[i].x, itemRectangles[i].y, itemRectangles[i].width, itemRectangles[i].height);
                     }
@@ -144,15 +145,15 @@ public class DropdownBox extends Component implements KeyListener {
 
     @Override
     public void resize() {
-        for(Rectangle r : rectangles){
+        for (Rectangle r : rectangles) {
             r.x = x;
             r.y = y;
             r.width = width;
             r.height = height;
         }
 
-        if(itemRectangles != null){
-            for(Rectangle r : itemRectangles){
+        if (itemRectangles != null) {
+            for (Rectangle r : itemRectangles) {
                 r.width = width;
                 r.height = height;
             }
@@ -164,18 +165,21 @@ public class DropdownBox extends Component implements KeyListener {
         return this.selectedId == 0;
     }
 
-    public void keyReleased(KeyEvent arg0) {}
-    public void keyTyped(KeyEvent arg0) {}
+    public void keyReleased(KeyEvent arg0) {
+    }
+
+    public void keyTyped(KeyEvent arg0) {
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(selectedId == 0){
-            if(Keyboard.isKeyDown(KeyEvent.VK_CONTROL) && Keyboard.isKeyDown(KeyEvent.VK_V)){
+        if (selectedId == 0) {
+            if (Keyboard.isKeyDown(KeyEvent.VK_CONTROL) && Keyboard.isKeyDown(KeyEvent.VK_V)) {
                 text = Constants.getClipboardString();
-            }else if(Keyboard.isKeyDown(KeyEvent.VK_CONTROL) && Keyboard.isKeyDown(KeyEvent.VK_C)){
+            } else if (Keyboard.isKeyDown(KeyEvent.VK_CONTROL) && Keyboard.isKeyDown(KeyEvent.VK_C)) {
                 Constants.setClipboardString(text);
-            }else{
-                switch(e.getKeyCode()){
+            } else {
+                switch (e.getKeyCode()) {
                     case KeyEvent.VK_BACK_SPACE:
                         text = StringUtils.backspace(text);
                         break;
@@ -200,11 +204,11 @@ public class DropdownBox extends Component implements KeyListener {
     public void setLineItems(String[] lineItems) {
         this.lineItems = lineItems;
 
-        if(lineItems != null){
+        if (lineItems != null) {
             this.itemRectangles = new Rectangle[lineItems.length];
 
-            for(int i = 0; i < lineItems.length; i++){
-                itemRectangles[i] = new Rectangle(x, y + ((i+1) * height), width, height);
+            for (int i = 0; i < lineItems.length; i++) {
+                itemRectangles[i] = new Rectangle(x, y + ((i + 1) * height), width, height);
             }
         }
     }

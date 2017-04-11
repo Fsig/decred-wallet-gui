@@ -22,7 +22,8 @@ public class LocalCommand {
     /**
      * Construct a new Local Command.
      */
-    public LocalCommand(){}
+    public LocalCommand() {
+    }
 
     /**
      * Execute a command and get the result.
@@ -30,16 +31,17 @@ public class LocalCommand {
      * @param command
      * @return String
      */
-    public String execute(String command){
+    public String execute(String command) {
         sb.delete(0, sb.length());
 
         try {
-            if(command.contains("dcrctl")) Constants.logWithoutSystem(command.replaceAll("-u '(.*?)'", "-u '***'").replaceAll("-P '(.*?)'", "-P '***'").replaceAll("--walletpass '(.*?)'", "--walletpass '***'").replaceAll("walletpassphrase '(.*?)'", "walletpassphrase '***'"));
+            if (command.contains("dcrctl"))
+                Constants.logWithoutSystem(command.replaceAll("-u '(.*?)'", "-u '***'").replaceAll("-P '(.*?)'", "-P '***'").replaceAll("--walletpass '(.*?)'", "--walletpass '***'").replaceAll("walletpassphrase '(.*?)'", "walletpassphrase '***'"));
 
-            if(Constants.isOsWindows()){
-                commands = new String[]{"cmd","/c", command};
-            }else{
-                commands = new String[]{"/bin/sh","-c", command};
+            if (Constants.isOsWindows()) {
+                commands = new String[]{"cmd", "/c", command};
+            } else {
+                commands = new String[]{"/bin/sh", "-c", command};
             }
 
             process = new ProcessBuilder(commands).start();
@@ -49,12 +51,12 @@ public class LocalCommand {
             stdOut = new PrintWriter(process.getOutputStream());
             s = null;
 
-            while((s = stdInput.readLine()) != null) {
+            while ((s = stdInput.readLine()) != null) {
                 sb.append(s);
                 sb.append("\n");
             }
 
-            while((s = stdError.readLine()) != null) {
+            while ((s = stdError.readLine()) != null) {
                 sb.append(s);
                 sb.append("\n");
             }
@@ -64,7 +66,7 @@ public class LocalCommand {
             stdOut.flush();
             stdOut.close();
             process.destroy();
-        }catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

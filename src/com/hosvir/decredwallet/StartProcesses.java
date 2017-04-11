@@ -9,14 +9,14 @@ import com.hosvir.decredwallet.gui.interfaces.Login;
  */
 public class StartProcesses extends Thread {
 
-    public StartProcesses(){
+    public StartProcesses() {
         this.setName("Decred Wallet - Start Processes");
         this.setPriority(MAX_PRIORITY);
     }
 
     public void run() {
         //No local DCRD
-        if(Processes.getClosestProcess("dcrd") == -1){
+        if (Processes.getClosestProcess("dcrd") == -1) {
             sleep(1000);
             Login.addLoadingMessage("Starting local DCRD process, this may take a minute.");
 
@@ -25,9 +25,9 @@ public class StartProcesses extends Thread {
             Constants.setDaemonProcess(new LocalProcess(Constants.getDaemonCommand()));
 
             //Check to see if the daemon is ready
-            while(!Constants.isDaemonProcessReady()){
-                for(String s : Constants.getDaemonProcess().log)
-                    if(s.contains("RPC server listening"))
+            while (!Constants.isDaemonProcessReady()) {
+                for (String s : Constants.getDaemonProcess().log)
+                    if (s.contains("RPC server listening"))
                         Constants.setDaemonProcessReady(true);
 
                 //Sleep
@@ -36,7 +36,7 @@ public class StartProcesses extends Thread {
         }
 
         //No local DCRWALLET
-        if(Processes.getClosestProcess("dcrwallet") == -1) {
+        if (Processes.getClosestProcess("dcrwallet") == -1) {
             sleep(1000);
             Login.addLoadingMessage("Starting local DCRWALLET process, this may take a minute.");
 
@@ -45,11 +45,11 @@ public class StartProcesses extends Thread {
             Constants.setWalletProcess(new LocalProcess(Constants.getWalletCommand()));
 
             //Check to see if the daemon is ready
-            while(!Constants.isWalletProcessReady()){
-                for(String s : Constants.getWalletProcess().log)
-                    if(s.contains("Opened wallet"))
+            while (!Constants.isWalletProcessReady()) {
+                for (String s : Constants.getWalletProcess().log)
+                    if (s.contains("Opened wallet"))
                         Constants.setWalletProcessReady(true);
-                    else if(s.contains("invalid passphrase for master public key"))
+                    else if (s.contains("invalid passphrase for master public key"))
                         Constants.log("Need public key, edit settings.conf");
 
                 //Sleep
@@ -70,7 +70,7 @@ public class StartProcesses extends Thread {
     private void sleep(int time) {
         try {
             Thread.sleep(time);
-        }catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

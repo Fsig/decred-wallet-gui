@@ -1,6 +1,6 @@
 package com.hosvir.decredwallet.websockets;
 
-import com.hosvir.decredwallet.utils.Param;
+import com.hosvir.decredwallet.Param;
 import org.json.simple.JSONObject;
 
 /**
@@ -10,7 +10,9 @@ import org.json.simple.JSONObject;
  */
 public interface Endpoint {
     public boolean connect(String username, String password);
+
     public void disconnect();
+
     public JSONObject callMethod(String method, Param[] params);
 }
 

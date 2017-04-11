@@ -1,9 +1,9 @@
 package com.hosvir.decredwallet.gui.interfaces.popups;
 
-import com.hosvir.decredwallet.Constants;
-import com.hosvir.decredwallet.gui.*;
 import com.deadendgine.Engine;
+import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.gui.Button;
+import com.hosvir.decredwallet.gui.*;
 import com.hosvir.decredwallet.gui.Component;
 
 import java.awt.*;
@@ -16,7 +16,7 @@ import java.awt.*;
 public class Passphrase extends Interface {
     public void init() {
         selectedId = -1;
-        InputBox passphrase = new InputBox("passphrase", (Engine.getWidth() / 2) - 250,Engine.getHeight() / 2,500,30);
+        InputBox passphrase = new InputBox("passphrase", (Engine.getWidth() / 2) - 250, Engine.getHeight() / 2, 500, 30);
         passphrase.textHidden = true;
 
         this.components.add(passphrase);
@@ -29,12 +29,12 @@ public class Passphrase extends Interface {
         super.update(delta);
 
         //For each component
-        for(Component c : components) {
-            if(c.containsMouse && c.enabled) Main.containsMouse = true;
+        for (Component c : components) {
+            if (c.containsMouse && c.enabled) Main.containsMouse = true;
 
-            if(c instanceof Button) {
-                if(c.selectedId == 0){
-                    switch(c.name){
+            if (c instanceof Button) {
+                if (c.selectedId == 0) {
+                    switch (c.name) {
                         case "cancel":
                             Constants.blockInterfaces(false, this);
                             getComponentByName("passphrase").text = "";

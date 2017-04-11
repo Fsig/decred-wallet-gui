@@ -8,8 +8,8 @@ import java.awt.*;
  * @since 20/03/17
  */
 public class GraphicsUtils {
-    public static void drawString(Graphics2D g, String string, int x, int y){
-        for(String s : string.split("\n")){
+    public static void drawString(Graphics2D g, String string, int x, int y) {
+        for (String s : string.split("\n")) {
             g.drawString(s, x, y += g.getFontMetrics().getHeight());
         }
     }

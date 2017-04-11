@@ -23,26 +23,26 @@ public class FileWriter {
      * @return boolean
      */
     public static boolean writeToFile(String fileName, String dataLine, boolean isAppendMode, boolean isNewLine) {
-        if(isNewLine)
+        if (isNewLine)
             dataLine = "\r\n" + dataLine;
 
         try {
             outFile = new File(fileName);
-            if(!outFile.getParentFile().exists())
+            if (!outFile.getParentFile().exists())
                 outFile.getParentFile().mkdirs();
 
-            if(!outFile.exists())
+            if (!outFile.exists())
                 outFile.createNewFile();
 
 
-            if(isAppendMode)
+            if (isAppendMode)
                 dos = new DataOutputStream(new FileOutputStream(fileName, true));
             else
                 dos = new DataOutputStream(new FileOutputStream(outFile));
 
             dos.writeBytes(dataLine);
             dos.close();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }

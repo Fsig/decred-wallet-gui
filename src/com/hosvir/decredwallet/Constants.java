@@ -1,13 +1,14 @@
 package com.hosvir.decredwallet;
 
+import com.deadendgine.utils.Random;
+import com.hosvir.decredwallet.gui.*;
+import com.hosvir.decredwallet.gui.Component;
 import com.hosvir.decredwallet.gui.interfaces.Footer;
 import com.hosvir.decredwallet.gui.interfaces.Navbar;
 import com.hosvir.decredwallet.utils.FileUtils;
-import com.hosvir.decredwallet.websockets.DecredEndpoint;
 import com.hosvir.decredwallet.utils.FileWriter;
 import com.hosvir.decredwallet.utils.Keystore;
-import com.deadendgine.utils.Random;
-import com.hosvir.decredwallet.gui.*;
+import com.hosvir.decredwallet.websockets.DecredEndpoint;
 import org.json.simple.JSONObject;
 
 import javax.swing.*;
@@ -27,6 +28,26 @@ import java.util.*;
  * @since 19/03/17
  */
 public class Constants {
+    public static String langFile;
+    public static int doubleClickDelay = 400;
+    public static int scrollDistance = 30;
+    public static int maxLogLines = 500;
+    public static int fpsMax = 30;
+    public static int fpsMin = 1;
+    public static ArrayList<String> guiLog = new ArrayList<String>();
+    public static ArrayList<Account> accounts = new ArrayList<Account>();
+    public static ArrayList<String> accountNames = new ArrayList<String>();
+    public static ArrayList<BaseGui> guiInterfaces = new ArrayList<BaseGui>();
+    public static ArrayList<Contact> contacts = new ArrayList<Contact>();
+    public static ArrayList<String> langConfFiles = new ArrayList<String>();
+    public static HashMap<String, String> langValues = new HashMap<String, String>();
+    public static ArrayList<String> stakePools = new ArrayList<String>();
+    public static Navbar navbar;
+    public static Footer footer;
+    public static GlobalCache globalCache;
+    public static String accountToRename;
+    public static boolean autoStart;
+    public static ArrayList<String> rpcLog;
     private static String version;
     private static String buildDate;
     private static String userHome;
@@ -59,64 +80,43 @@ public class Constants {
     private static File langFolder;
     private static File dcrdCert;
     private static File walletCert;
-
     private static boolean enableOpenGL;
     private static boolean enableFps;
     private static boolean debug;
-
     private static ArrayList<String> allowedPasswordClasses;
-
     private static Throwable throwable;
     private static StackTraceElement[] elements;
     private static String callerClassName;
-
     private static Date date;
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy - hh:mm:ss a");
     private static SimpleDateFormat wsdf = new SimpleDateFormat("MMM dd:hh!mm!ss a");
-
     private static LocalProcess daemonProcess;
     private static LocalProcess walletProcess;
     private static DecredEndpoint dcrdEndpoint;
     private static DecredEndpoint dcrwalletEndpoint;
     private static boolean daemonProcessReady, walletProcessReady, daemonReady, walletReady, requirePublicPass, testnet;
     private static Main mainGui;
-
     private static Random random;
     private static ArrayList<String> langFiles;
-    public static String langFile;
-
     private static Properties properties;
-
-    public static int doubleClickDelay = 400;
-    public static int scrollDistance = 30;
-    public static int maxLogLines = 500;
-    public static int fpsMax = 30;
-    public static int fpsMin = 1;
-
     private static Clipboard clipboard;
-    public static ArrayList<String> guiLog = new ArrayList<String>();
-    public static ArrayList<Account> accounts = new ArrayList<Account>();
-    public static ArrayList<String> accountNames = new ArrayList<String>();
-    public static ArrayList<BaseGui> guiInterfaces = new ArrayList<BaseGui>();
-    public static ArrayList<Contact> contacts = new ArrayList<Contact>();
-    public static ArrayList<String> langConfFiles = new ArrayList<String>();
-    public static HashMap<String, String> langValues = new HashMap<String, String>();
-    public static ArrayList<String> stakePools = new ArrayList<String>();
-    public static Navbar navbar;
-    public static Footer footer;
-    public static GlobalCache globalCache;
-    public static String accountToRename;
-
-    public static boolean autoStart;
-    public static ArrayList<String> rpcLog;
-
+    private static String testnetWarning = "TESTNET";
+    public static ArrayList<Pool> pools = new ArrayList<Pool>();
+    private static String poolAccountName;
+    private static String poolName;
+    private static String poolUrl;
+    private static String poolFeePercent;
+    private static String poolAddress;
+    private static String poolTicketAddress;
+    private static String poolApiKey;
+    private static int minConfirmations;
 
     /**
      * Initialise constants.
      */
     public static void initialise() {
-        version = "0.2.8";
-        buildDate = "21/03/2017";
+        version = "0.2.9";
+        buildDate = "11/04/2017";
         random = new Random();
         guiLog = new ArrayList<String>();
         langFiles = new ArrayList<String>();
@@ -133,14 +133,14 @@ public class Constants {
         Constants.guiLog.add("Build date: " + Constants.getBuildDate() + "\n");
 
         //OS is Windows... poor fella
-        if(isOsWindows()){
+        if (isOsWindows()) {
             osQuote = "\"";
             daemonBin = "dcrd.exe";
             walletBin = "dcrwallet.exe";
             dcrctlBin = "dcrctl.exe";
             dcrdFolder = System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Local" + File.separator + "Dcrd";
-            dcrwalletFolder = System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Local" + File.separator +  "Dcrwallet";
-        }else{
+            dcrwalletFolder = System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Local" + File.separator + "Dcrwallet";
+        } else {
             osQuote = "'";
             daemonBin = "dcrd";
             walletBin = "dcrwallet";
@@ -153,7 +153,7 @@ public class Constants {
         extraWalletArguments = "";
         extraDcrctlArguments = "";
 
-        //Add stake pools
+        //Add stake pools - TO BE REMOVED
         stakePools.add("pos-bravo");
         stakePools.add("pos-delta");
         stakePools.add("pos-echo");
@@ -189,18 +189,18 @@ public class Constants {
         properties = new Properties();
 
         //Create default settings
-        if(!settingsFile.exists()) {
+        if (!settingsFile.exists()) {
             createDefaultProperties();
-        }else{
-            try{
+        } else {
+            try {
                 properties.load(new FileInputStream(new File(userHome + ".version.conf")));
                 String fileVersion = properties.getProperty("Version");
 
-                if(!fileVersion.startsWith(version)){
+                if (!fileVersion.startsWith(version)) {
                     log("Version mismatch, GUI: " + version + ", File: " + fileVersion);
                     updateConfFiles();
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 log("Missing version file, it is recommended that you delete your settings.conf and allow the program to create a new settings file for you.");
                 FileWriter.writeToFile(userHome + ".version.conf", "Version=" + version, false, false);
             }
@@ -210,11 +210,11 @@ public class Constants {
         createDefaultLanguages();
 
         //Get lang files
-        for(File f : langFolder.listFiles()){
+        for (File f : langFolder.listFiles()) {
             langFiles.add(f.getName());
         }
 
-        try{
+        try {
             properties.load(new FileInputStream(settingsFile));
 
             decredLocation = properties.getProperty("Decred-Location");
@@ -232,10 +232,20 @@ public class Constants {
             fpsMax = Integer.valueOf(properties.getProperty("FPS-Max"));
             fpsMin = Integer.valueOf(properties.getProperty("FPS-Min"));
             debug = Boolean.valueOf(properties.getProperty("Debug"));
+            poolAccountName = properties.getProperty("Pool-Account-Name");
+            poolName = properties.getProperty("Pool-Name");
+            poolUrl = properties.getProperty("Pool-URL");
+            poolFeePercent = properties.getProperty("Pool-Fee-Percent");
+            poolAddress = properties.getProperty("Pool-Address");
+            poolTicketAddress = properties.getProperty("Pool-Ticket-Address");
+            poolApiKey = properties.getProperty("Pool-API-Key");
+            minConfirmations = Integer.valueOf(properties.getProperty("Min-Confirmations-Required"));
 
-            if(!decredLocation.endsWith(File.separator)) decredLocation += File.separator;
+            if (!decredLocation.endsWith(File.separator)) {
+                decredLocation += File.separator;
+            }
 
-            if(!new File(decredLocation).exists()){
+            if (!new File(decredLocation).exists()) {
                 log("Decred Location: '" + decredLocation + "' does not exist, update settings.conf");
 
                 //Notify user about options as they may not have the process attached to a terminal to see output
@@ -249,8 +259,8 @@ public class Constants {
 
 
             //Import local certificates
-            if(isOsWindows()){
-                if(new File(System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Local" + File.separator + "Dcrd" + File.separator + "rpc.cert").exists()){
+            if (isOsWindows()) {
+                if (new File(System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Local" + File.separator + "Dcrd" + File.separator + "rpc.cert").exists()) {
                     Keystore.importCertificate(System.getProperty("user.home") + File.separator +
                             "AppData" + File.separator +
                             "Local" + File.separator +
@@ -262,8 +272,8 @@ public class Constants {
                             "Dcrwallet" + File.separator +
                             "rpc.cert", "dcrwallet", keystore);
                 }
-            }else{
-                if(new File(System.getProperty("user.home") + File.separator + ".dcrd" + File.separator + "rpc.cert").exists()){
+            } else {
+                if (new File(System.getProperty("user.home") + File.separator + ".dcrd" + File.separator + "rpc.cert").exists()) {
                     Keystore.importCertificate(System.getProperty("user.home") + File.separator +
                             ".dcrd" + File.separator +
                             "rpc.cert", "dcrd", keystore);
@@ -278,22 +288,23 @@ public class Constants {
 
             //Change Key store
             Keystore.loadKeystore(userHome + "decredWalletKeystore");
+            Keystore.setTrustManager();
             System.setProperty("javax.net.ssl.trustStore", userHome + "decredWalletKeystore");
             System.setProperty("javax.net.ssl.trustStorePassword", keystorePassword);
 
             //Check for public pass
-            if(publicPassPhrase != null && publicPassPhrase.length() > 1){
+            if (publicPassPhrase != null && publicPassPhrase.length() > 1) {
                 requirePublicPass = true;
                 extraWalletArguments += " --walletpass " + osQuote + publicPassPhrase + osQuote;
             }
 
             //Check for testnet
-            if(testnet){
+            if (testnet) {
                 extraDaemonArguments += " --testnet";
                 extraWalletArguments += " --testnet";
                 extraDcrctlArguments += " --testnet";
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Unable to find settings file.");
             e.printStackTrace();
         }
@@ -308,7 +319,7 @@ public class Constants {
         rpcWalletIp = "127.0.0.1";
 
         //Check for random username/password
-        if(daemonUsername.trim().equals("random") && daemonPassword.trim().equals("random")) {
+        if (daemonUsername.trim().equals("random") && daemonPassword.trim().equals("random")) {
             daemonUsername = generateRandomString(random.random(16, 26));
             daemonPassword = generateRandomString(random.random(16, 26));
             autoStart = true;
@@ -339,14 +350,14 @@ public class Constants {
         reloadLanguage();
 
         //Load contacts
-        try{
+        try {
             BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(userHome + "contacts.data")));
             String line = "";
             String[] splitLine;
             int count = 0;
 
-            while((line = input.readLine()) != null){
-                if(line.length() > 3){
+            while ((line = input.readLine()) != null) {
+                if (line.length() > 3) {
                     splitLine = line.split(":");
                     contacts.add(new Contact(count, splitLine[0], splitLine[1], splitLine[2]));
 
@@ -355,7 +366,7 @@ public class Constants {
             }
 
             input.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             log("Unable to load contacts.");
 
             //Display error to user
@@ -372,15 +383,15 @@ public class Constants {
      * Reload the language from file
      */
     public static void reloadLanguage() {
-        try{
+        try {
             langValues.clear();
             properties.clear();
             properties.load(new FileInputStream(new File(langFolder + File.separator + langFile + ".conf")));
 
-            for(Map.Entry<Object, Object> e : properties.entrySet()){
-                langValues.put((String) e.getKey(),(String) e.getValue());
+            for (Map.Entry<Object, Object> e : properties.entrySet()) {
+                langValues.put((String) e.getKey(), (String) e.getValue());
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             log("Error loading language.");
             e.printStackTrace();
         }
@@ -392,9 +403,9 @@ public class Constants {
     private static void createDefaultProperties() {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Decred settings", false, false);
 
-        if(isOsWindows()){
+        if (isOsWindows()) {
             FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Decred-Location=C:/users/user/decred/", true, true);
-        }else{
+        } else {
             FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Decred-Location=/home/user/decred/", true, true);
         }
 
@@ -410,13 +421,23 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Scroll-Distance=30", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Max-Log-Lines=500", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Keystore-Password=" + generateRandomString(32), true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Min-Confirmations-Required=3", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Display settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-OpenGL=true", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-FPS=false", true, true);
-        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Max=30", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Max=60", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Min=10", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Debug=false", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#POS Pool settings", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Account-Name=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Name=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-URL=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Percent=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Address=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Ticket-Address=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-API-Key=", true, true);
 
         //Create version file
         FileWriter.writeToFile(userHome + ".version.conf", "Version=" + version, false, false);
@@ -446,8 +467,8 @@ public class Constants {
      * Create default properties
      */
     private static void createDefaultLanguages() {
-        for(String s : langConfFiles){
-            if(!new File(langFolder.getPath() + File.separator + s).exists()){
+        for (String s : langConfFiles) {
+            if (!new File(langFolder.getPath() + File.separator + s).exists()) {
                 FileUtils.exportResource("/resources/lang/" + s, langFolder.getPath());
                 log("Added new Language file: " + s);
             }
@@ -471,6 +492,7 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Scroll-Distance=" + scrollDistance, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Max-Log-Lines=" + maxLogLines, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Keystore-Password=" + keystorePassword, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Min-Confirmations-Required=" + minConfirmations, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Display settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-OpenGL=" + enableOpenGL, true, true);
@@ -478,6 +500,15 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Max=" + fpsMax, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Min=" + fpsMin, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Debug=" + debug, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#POS Pool settings", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Account-Name=" + poolAccountName, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Name=" + poolName, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-URL=" + poolUrl, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Percent=" + poolFeePercent, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Address=" + poolAddress, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Ticket-Address=" + poolTicketAddress, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-API-Key=" + poolApiKey, true, true);
     }
 
     /**
@@ -485,45 +516,115 @@ public class Constants {
      */
     public static void updateConfFiles() {
         //Add any new changes to conf files here after the first release.
-        for(String s : langConfFiles){
+        for (String s : langConfFiles) {
             File file = new File(langFolder.getPath() + File.separator + s);
-            if(file.exists()){
-                if(file.delete()){
+            if (file.exists()) {
+                if (file.delete()) {
                     log("Deleted outdated Language file: " + file.getName());
-                }else{
+                } else {
                     log("Failed to delete outdated Language file: " + file.getName());
                 }
             }
         }
 
         //Create contacts file
-        if(!new File(userHome + "contacts.data").exists()){
+        if (!new File(userHome + "contacts.data").exists()) {
             FileWriter.writeToFile(userHome + "contacts.data", "Donate:fsig@hmamail.com:DsmcWt82aeraJ22bayUtMXm8dyRL8bFnBVY", false, false);
         }
 
-        //Add debug flag
-        try{
+        //Add old settings
+        try {
             properties.load(new FileInputStream(settingsFile));
 
-            //New debug setting
-            if(properties.getProperty("Debug") == null){
-                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Debug=false", true, true);
+            //New pos settings
+            if (properties.getProperty("Pool-Name") == null) {
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Min-Confirmations-Required=3", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Name=", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-URL=", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Percent=", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Address=", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Ticket-Address=", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-API-Key=", true, true);
             }
 
-            //New key store setting
-            if(properties.getProperty("Keystore-Password") == null){
-                keystorePassword = generateRandomString(32);
-                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Keystore-Password=" + keystorePassword, true, true);
-
-                //Create Key store
-                Keystore.createNewKeystore(userHome + "decredWalletKeystore");
-            }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         //Last, update version
         FileWriter.writeToFile(userHome + ".version.conf", "Version=" + version, false, false);
+    }
+
+    /**
+     * Reload accounts.
+     */
+    public static void reloadAccounts() {
+        for (Account a : accounts) {
+            a.setRunning(false);
+        }
+
+        accounts.clear();
+        accountNames.clear();
+
+        for (Iterator iterator = Api.getAccounts().keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            accounts.add(new Account(key));
+            accountNames.add(key);
+        }
+
+        //Reset rectangles for interfaces
+        guiInterfaces.get(0).rectangles = null;
+        guiInterfaces.get(3).rectangles = null;
+        guiInterfaces.get(4).rectangles = null;
+    }
+
+    /**
+     * Get the pool list.
+     */
+    public static void reloadPools() {
+        PoolComparator pc = new PoolComparator();
+        JSONObject poolList = ApiPool.getPoolList();
+        stakePools.clear();
+
+        for (Object key : poolList.keySet()) {
+            String name = (String) key;
+            JSONObject pool = (JSONObject) poolList.get(name);
+
+            //Add to pool list
+            pools.add(new Pool(
+                    name,
+                    pool.get("Network").toString(),
+                    pool.get("URL").toString(),
+                    (boolean) pool.get("APIEnabled"),
+                    (long) pool.get("Immature"),
+                    (long) pool.get("Live"),
+                    (long) pool.get("Voted"),
+                    (long) pool.get("Missed"),
+                    Double.valueOf(pool.get("PoolFees").toString()),
+                    Double.valueOf(pool.get("ProportionLive").toString()),
+                    (long) pool.get("UserCount")
+            ));
+
+            //Network
+            String network = testnet ? "testnet" : "mainnet";
+
+            //Check if pool valid
+            if (Boolean.valueOf(pool.get("APIEnabled").toString()) && pool.get("Network").toString().toLowerCase().equals(network)) {
+                stakePools.add(name);
+            }
+        }
+
+        //Sort pools
+        Collections.sort(pools, pc);
+        Collections.sort(stakePools);
+
+        //Update selection list
+        Interface.class.cast(guiInterfaces.get(5)).getComponentByName("poolInput").text = Constants.stakePools.get(0);
+        DropdownBox.class.cast(
+                Interface.class.cast(
+                        guiInterfaces.get(5)
+                ).getComponentByName("poolInput")
+        ).lineItems = Constants.stakePools.toArray(new String[Constants.stakePools.size()]);
     }
 
     /**
@@ -535,7 +636,9 @@ public class Constants {
         System.out.println(getDate() + ": " + message);
         guiLog.add(getDate() + ": " + message);
 
-        if(guiInterfaces.size() > 5) guiInterfaces.get(5).resize();
+        if (guiInterfaces.size() > 8) {
+            guiInterfaces.get(8).resize();
+        }
     }
 
     /**
@@ -546,7 +649,9 @@ public class Constants {
     public synchronized static void logWithoutSystem(String message) {
         guiLog.add(getDate() + ": " + message);
 
-        if(guiInterfaces.size() > 5) guiInterfaces.get(5).resize();
+        if (guiInterfaces.size() > 8) {
+            guiInterfaces.get(8).resize();
+        }
     }
 
     /**
@@ -556,23 +661,26 @@ public class Constants {
      * @return String
      */
     public static String getLangValue(String key) {
-        for(Map.Entry<String, String> e : langValues.entrySet()){
-            if(e.getKey().toLowerCase().equals(key.toLowerCase()))
+        for (Map.Entry<String, String> e : langValues.entrySet()) {
+            if (e.getKey().toLowerCase().equals(key.toLowerCase())) {
                 return e.getValue();
+            }
         }
 
         return "Missing lang conf";
     }
 
-    public static synchronized void unselectOtherInputs(ArrayList<com.hosvir.decredwallet.gui.Component> components, com.hosvir.decredwallet.gui.Component exclude) {
-        for(com.hosvir.decredwallet.gui.Component c : components)
-            if(c instanceof InputBox)
-                if(c != exclude) c.selectedId = -1;
+    public static synchronized void unselectOtherInputs(ArrayList<Component> components, Component exclude) {
+        for (Component c : components) {
+            if (c instanceof InputBox) {
+                if (c != exclude) c.selectedId = -1;
+            }
+        }
     }
 
     public static synchronized void unselectAllInputs(ArrayList<com.hosvir.decredwallet.gui.Component> components) {
-        for(com.hosvir.decredwallet.gui.Component c : components)
-            if(c instanceof InputBox)
+        for (com.hosvir.decredwallet.gui.Component c : components)
+            if (c instanceof InputBox)
                 c.selectedId = -1;
     }
 
@@ -592,7 +700,7 @@ public class Constants {
      *
      * @return String
      */
-    public static String getDate(){
+    public static String getDate() {
         date = new Date();
         return sdf.format(date);
     }
@@ -602,9 +710,9 @@ public class Constants {
      *
      * @return String
      */
-    public static String getWalletDate(long timestamp){
+    public static String getWalletDate(long timestamp) {
         date = new Date();
-        date.setTime(timestamp*1000);
+        date.setTime(timestamp * 1000);
         return wsdf.format(date);
     }
 
@@ -614,9 +722,9 @@ public class Constants {
      * @param timestamp
      * @return String
      */
-    public static String formatDate(long timestamp){
+    public static String formatDate(long timestamp) {
         date = new Date();
-        date.setTime(timestamp*1000);
+        date.setTime(timestamp * 1000);
         return sdf.format(date);
     }
 
@@ -626,17 +734,17 @@ public class Constants {
      * @param l
      * @return String
      */
-    public static String formatTime(long l){
+    public static String formatTime(long l) {
         DecimalFormat dec = new DecimalFormat("#.##");
         String result = "";
 
-        if(l > 1000 && l < 60000){ //Seconds
-            result += dec.format((double)l / 1000) + " Seconds";
-        }else if(l > 60000 && l < 3600000){ //Minutes
-            result += dec.format((double)l / 60000) + " Minutes";
-        }else if(l > 3600000){ //Hours
-            result += dec.format((double)l / 3600000) + " Hours";
-        }else{
+        if (l > 1000 && l < 60000) { //Seconds
+            result += dec.format((double) l / 1000) + " Seconds";
+        } else if (l > 60000 && l < 3600000) { //Minutes
+            result += dec.format((double) l / 60000) + " Minutes";
+        } else if (l > 3600000) { //Hours
+            result += dec.format((double) l / 3600000) + " Hours";
+        } else {
             result += dec.format((double) l) + " Milliseconds";
         }
 
@@ -669,7 +777,7 @@ public class Constants {
     public synchronized static void saveContacts() {
         FileWriter.writeToFile(userHome + "contacts.data", "", false, false);
 
-        for(Contact c : contacts){
+        for (Contact c : contacts) {
             FileWriter.writeToFile(userHome + "contacts.data", c.getName() + ":" + c.getEmail() + ":" + c.getAddress(), true, true);
         }
     }
@@ -685,7 +793,7 @@ public class Constants {
         StringBuilder sb = new StringBuilder(length);
         Random random = new Random();
 
-        for(int i = 0; i < length; i++){
+        for (int i = 0; i < length; i++) {
             sb.append(characters.charAt(random.nextInt(characters.length())));
         }
 
@@ -697,7 +805,7 @@ public class Constants {
      *
      * @return String
      */
-    private static String getOS(){
+    private static String getOS() {
         return System.getProperty("os.name") + ", " + System.getProperty("os.arch") + ", " + System.getProperty("os.version");
     }
 
@@ -709,12 +817,16 @@ public class Constants {
         return getOS().toLowerCase().contains("linux");
     }
 
+    public static String getOSName() {
+        return System.getProperty("os.name");
+    }
+
     /**
      * Get the JVM architecture
      *
      * @return String
      */
-    public static String getOSArch(){
+    public static String getOSArch() {
         return System.getProperty("os.arch");
     }
 
@@ -723,7 +835,7 @@ public class Constants {
      *
      * @return String
      */
-    public static String getUser(){
+    public static String getUser() {
         return System.getProperty("user.name");
     }
 
@@ -744,9 +856,9 @@ public class Constants {
      * @return Clipboard string data
      */
     public static String getClipboardString() {
-        try{
+        try {
             return (String) clipboard.getContents(null).getTransferData(DataFlavor.stringFlavor);
-        }catch(Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
@@ -760,40 +872,15 @@ public class Constants {
         clipboard.setContents(new StringSelection(text), null);
     }
 
-    public static void reloadAccounts() {
-        for(Account a : accounts) a.setRunning(false);
-
-        accounts.clear();
-        accountNames.clear();
-
-        for(Iterator iterator = Api.getAccounts().keySet().iterator(); iterator.hasNext();) {
-            String key = (String) iterator.next();
-            accounts.add(new Account(key));
-            accountNames.add(key);
-        }
-
-        /*for(JsonObjects jos : Api.getAccounts().get(0).getJsonObjects()){
-            if(!jos.getName().trim().equals("result")){
-                accounts.add(new Account(jos.getName()));
-                accountNames.add(jos.getName());
-            }
-        }*/
-
-        //Reset rectangles for interfaces
-        guiInterfaces.get(0).rectangles = null;
-        guiInterfaces.get(3).rectangles = null;
-        guiInterfaces.get(4).rectangles = null;
-    }
-
     public static void forceUpdateAllAccounts() {
-        for(Account a : accounts) a.forceUpdate = true;
+        for (Account a : accounts) a.forceUpdate = true;
     }
 
     public static void blockInterfaces(boolean block, BaseGui gui) {
         navbar.blockInput = block;
 
-        for(BaseGui b : guiInterfaces)
-            if(b != gui)
+        for (BaseGui b : guiInterfaces)
+            if (b != gui)
                 b.blockInput = block;
     }
 
@@ -805,35 +892,38 @@ public class Constants {
         if (Constants.accounts.get(0).name.trim().equals(name.trim())) {
             isDefault = true;
         }
-        if (name.trim().equals("imported")) {
-            for (int i = 0; i < Constants.globalCache.transactions.size(); i++){
-                JSONObject transaction = (JSONObject) Constants.globalCache.transactions.get(i);
 
-                if (String.valueOf(transaction.get("account")).trim().equals(name.trim()) ||
-                        (String.valueOf(transaction.get("txtype")).trim().equals("vote") ||
-                                String.valueOf(transaction.get("txtype")).trim().equals("ticket"))) {
+        if (Constants.globalCache.transactions != null) {
+            if (name.trim().equals("imported")) {
+                for (int i = 0; i < Constants.globalCache.transactions.size(); i++) {
+                    JSONObject transaction = (JSONObject) Constants.globalCache.transactions.get(i);
 
-                    if (transaction.get("address") != null) {
-                        transactions.add(transaction);
+                    if (String.valueOf(transaction.get("account")).trim().equals(name.trim()) ||
+                            (String.valueOf(transaction.get("txtype")).trim().equals("vote") ||
+                                    String.valueOf(transaction.get("txtype")).trim().equals("ticket"))) {
+
+                        if (transaction.get("address") != null) {
+                            transactions.add(transaction);
+                        }
                     }
                 }
-            }
-        } else {
-            for (int i = 0; i < Constants.globalCache.transactions.size(); i++) {
-                JSONObject transaction = (JSONObject) Constants.globalCache.transactions.get(i);
+            } else {
+                for (int i = 0; i < Constants.globalCache.transactions.size(); i++) {
+                    JSONObject transaction = (JSONObject) Constants.globalCache.transactions.get(i);
 
-                if (String.valueOf(transaction.get("account")).trim().equals(name.trim()) &&
-                        !String.valueOf(transaction.get("txtype")).trim().equals("vote") &&
-                        !String.valueOf(transaction.get("txtype")).trim().equals("ticket") ||
-                        (isDefault && String.valueOf(transaction.get("account")).trim().length() == 0 &&
-                                !String.valueOf(transaction.get("txtype")).trim().equals("vote") &&
-                                !String.valueOf(transaction.get("txtype")).trim().equals("ticket"))) {
+                    if (String.valueOf(transaction.get("account")).trim().equals(name.trim()) &&
+                            !String.valueOf(transaction.get("txtype")).trim().equals("vote") &&
+                            !String.valueOf(transaction.get("txtype")).trim().equals("ticket") ||
+                            (isDefault && String.valueOf(transaction.get("account")).trim().length() == 0 &&
+                                    !String.valueOf(transaction.get("txtype")).trim().equals("vote") &&
+                                    !String.valueOf(transaction.get("txtype")).trim().equals("ticket"))) {
 
-                    if (String.valueOf(transaction.get("category")).trim().equals("send") &&
-                            String.valueOf(transaction.get("fee")).trim().equals("0")) {
-                        //System.out.println("Hiding counter transaction");
-                    } else {
-                        transactions.add(transaction);
+                        if (String.valueOf(transaction.get("category")).trim().equals("send") &&
+                                String.valueOf(transaction.get("fee")).trim().equals("0")) {
+                            //System.out.println("Hiding counter transaction");
+                        } else {
+                            transactions.add(transaction);
+                        }
                     }
                 }
             }
@@ -843,8 +933,8 @@ public class Constants {
     }
 
     public static Account getAccountByName(String name) {
-        for(Account a : accounts){
-            if(a.name.trim().equals(name.trim()))
+        for (Account a : accounts) {
+            if (a.name.trim().equals(name.trim()))
                 return a;
         }
 
@@ -857,17 +947,17 @@ public class Constants {
      * @param url
      */
     public static void openLink(String url) {
-        if(Desktop.isDesktopSupported()) {
+        if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
-            }catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
     public static boolean isPrivatePassphraseSet() {
-        if(privatePassPhrase != null && privatePassPhrase != "") return true;
+        if (privatePassPhrase != null && privatePassPhrase != "") return true;
 
         return false;
     }
@@ -920,11 +1010,11 @@ public class Constants {
         Constants.walletReady = walletReady;
     }
 
-    public static boolean isRequirePublicPass(){
+    public static boolean isRequirePublicPass() {
         return requirePublicPass;
     }
 
-    public static void setRequirePublicPass(boolean requirePublicPass){
+    public static void setRequirePublicPass(boolean requirePublicPass) {
         Constants.requirePublicPass = requirePublicPass;
     }
 
@@ -1009,16 +1099,16 @@ public class Constants {
     }
 
     public static boolean isContact(String name) {
-        for(Contact c : contacts)
-            if(c.getName().toLowerCase().trim().contains(name.toLowerCase().trim()))
+        for (Contact c : contacts)
+            if (c.getName().toLowerCase().trim().contains(name.toLowerCase().trim()))
                 return true;
 
         return false;
     }
 
     public static Contact getContact(String name) {
-        for(Contact c : contacts)
-            if(c.getName().toLowerCase().trim().contains(name.toLowerCase().trim()))
+        for (Contact c : contacts)
+            if (c.getName().toLowerCase().trim().contains(name.toLowerCase().trim()))
                 return c;
 
         return null;
@@ -1036,7 +1126,7 @@ public class Constants {
         Constants.dcrdEndpoint = dcrdEndpoint;
     }
 
-    public static void setDcrdEnpointURI(String uri){
+    public static void setDcrdEnpointURI(String uri) {
         rpcDaemonIp = uri;
         dcrdEndpoint.uri = rpcProtocol + rpcDaemonIp + ":" + rpcDaemonPort + rpcProtocolEnd;
     }
@@ -1049,7 +1139,7 @@ public class Constants {
         Constants.dcrwalletEndpoint = dcrwalletEndpoint;
     }
 
-    public static void setDcrwalletEnpointURI(String uri){
+    public static void setDcrwalletEnpointURI(String uri) {
         rpcWalletIp = uri;
         dcrwalletEndpoint.uri = rpcProtocol + rpcWalletIp + ":" + rpcWalletPort + rpcProtocolEnd;
     }
@@ -1132,5 +1222,93 @@ public class Constants {
 
     public static String getKeystore() {
         return keystore;
+    }
+
+    public static boolean isTestnet() {
+        return testnet;
+    }
+
+    public static String getTestnetWarning() {
+        return testnetWarning;
+    }
+
+    public static String getPoolAccountName() {
+        return poolAccountName;
+    }
+
+    public static void setPoolAccountName(String poolAccountName) {
+        Constants.poolAccountName = poolAccountName;
+    }
+
+    public static String getPoolName() {
+        return poolName;
+    }
+
+    public static void setPoolName(String poolName) {
+        Constants.poolName = poolName;
+    }
+
+    public static String getPoolUrl() {
+        return poolUrl;
+    }
+
+    public static void setPoolUrl(String poolUrl) {
+        Constants.poolUrl = poolUrl;
+    }
+
+    public static String getPoolFeePercent() {
+        return poolFeePercent;
+    }
+
+    public static void setPoolFeePercent(String poolFeePercent) {
+        Constants.poolFeePercent = poolFeePercent;
+    }
+
+    public static String getPoolAddress() {
+        return poolAddress;
+    }
+
+    public static void setPoolAddress(String poolAddress) {
+        Constants.poolAddress = poolAddress;
+    }
+
+    public static String getPoolTicketAddress() {
+        return poolTicketAddress;
+    }
+
+    public static void setPoolTicketAddress(String poolTicketAddress) {
+        Constants.poolTicketAddress = poolTicketAddress;
+    }
+
+    public static String getPoolApiKey() {
+        return poolApiKey;
+    }
+
+    public static void setPoolApiKey(String poolApiKey) {
+        Constants.poolApiKey = poolApiKey;
+    }
+
+    public static String getSelectedPoolAccountName() {
+        for (String name : accountNames) {
+            if (name.toLowerCase().equals(poolAccountName.toLowerCase())) {
+                return name;
+            }
+        }
+
+        return accountNames.get(0);
+    }
+
+    public static Pool getPoolByName(String name) {
+        for (Pool pool : pools) {
+            if (pool.getName().equals(name)) {
+                return pool;
+            }
+        }
+
+        return null;
+    }
+
+    public static int getMinConfirmations() {
+        return minConfirmations;
     }
 }

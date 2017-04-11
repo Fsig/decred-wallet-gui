@@ -1,8 +1,11 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
-import com.hosvir.decredwallet.gui.BaseGui;
-import com.hosvir.decredwallet.gui.Images;
 import com.deadendgine.Engine;
+import com.hosvir.decredwallet.Constants;
+import com.hosvir.decredwallet.gui.BaseGui;
+import com.hosvir.decredwallet.gui.ColorConstants;
+import com.hosvir.decredwallet.gui.FontConstants;
+import com.hosvir.decredwallet.gui.Images;
 
 import java.awt.*;
 
@@ -15,13 +18,13 @@ public class Navbar extends BaseGui {
     private int a;
 
     @Override
-    public void init(){
+    public void init() {
         selectedId = -1;
 
         rectangles = new Rectangle[(Images.getIcons().length / 2)];
 
-        for(int i = 0; i < rectangles.length; i++){
-            rectangles[i] = new Rectangle(Engine.getWidth() - ((i+1) * 52),
+        for (int i = 0; i < rectangles.length; i++) {
+            rectangles[i] = new Rectangle(Engine.getWidth() - ((i + 1) * 52),
                     3,
                     Images.getIcons()[0].getWidth(),
                     Images.getIcons()[0].getHeight());
@@ -47,8 +50,8 @@ public class Navbar extends BaseGui {
                 null);
 
         //Draw icons
-        for(int i = 0; i < rectangles.length; i++){
-            if(selectedId == i){
+        for (int i = 0; i < rectangles.length; i++) {
+            if (selectedId == i) {
                 a = i;
 
                 g.drawImage(Images.getInterfaces()[1],
@@ -57,7 +60,7 @@ public class Navbar extends BaseGui {
                         52,
                         60,
                         null);
-            }else{
+            } else {
                 a = i + rectangles.length;
             }
 
@@ -77,7 +80,7 @@ public class Navbar extends BaseGui {
         }
 
         //Hover nav item
-        if(hoverId != -1 && hoverId != selectedId){
+        if (hoverId != -1 && hoverId != selectedId) {
             g.drawImage(Images.getIcons()[hoverId],
                     rectangles[hoverId].x,
                     rectangles[hoverId].y,
@@ -85,14 +88,22 @@ public class Navbar extends BaseGui {
                     rectangles[hoverId].height,
                     null);
         }
+
+        //Testnet warning
+        if (Constants.isTestnet()) {
+            g.setFont(FontConstants.dcrFont);
+            g.setColor(ColorConstants.flatRed);
+
+            g.drawString(Constants.getTestnetWarning(), 260, 45);
+        }
     }
 
     /**
      * Resize the bounds
      */
     public void resize() {
-        for(int i = 0; i < rectangles.length; i++){
-            rectangles[i].x = Engine.getWidth() - ((i+1) * 52);
+        for (int i = 0; i < rectangles.length; i++) {
+            rectangles[i].x = Engine.getWidth() - ((i + 1) * 52);
         }
     }
 

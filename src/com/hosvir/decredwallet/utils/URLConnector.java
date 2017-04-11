@@ -23,29 +23,48 @@ public class URLConnector {
     private static BufferedReader rd;
     private static OutputStreamWriter wr;
 
-    public static String getPage(String urlString, String[] fields, String[] values){
-        try{
+    public static String getPage(String urlString) {
+        return getPage(urlString, null, null, null, null);
+    }
+
+    public static String getPage(String urlString, String[] fields, String[] values, String[] customHeaders, String[] customHeaderValues) {
+        try {
             url = new URL(urlString);
             conn = url.openConnection();
+            html = "";
+            data = "";
+            line = "";
 
             /**
              * Set request properties to emulate a browser.
              */
-            conn.addRequestProperty("Accept","text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
-            conn.addRequestProperty("Accept-Charset","ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+            conn.addRequestProperty("Accept", "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+            conn.addRequestProperty("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
             conn.addRequestProperty("Accept-Encoding", "gzip,deflate");
             conn.addRequestProperty("Accept-Language", "en-gb,en;q=0.5");
             conn.addRequestProperty("Connection", "keep-alive");
             conn.addRequestProperty("Host", urlString);
             conn.addRequestProperty("Keep-Alive", "300");
-            conn.addRequestProperty("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/A.B (KHTML, like Gecko) Chrome/X.Y.Z.W Safari/A.B.");
+            conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/A.B (KHTML, like Gecko) Chrome/X.Y.Z.W Safari/A.B.");
+
+            /**
+             * Custom headers
+             */
+            if (customHeaders != null && customHeaderValues != null) {
+                for (int i = 0; i < customHeaders.length; i++) {
+                    conn.addRequestProperty(
+                            customHeaders[i],
+                            customHeaderValues[i]
+                    );
+                }
+            }
 
             /**
              * Post values, if needed.
              */
-            if(fields != null && values != null){
-                for(int i = 0; i < fields.length; i++){
-                    if(i > 0)
+            if (fields != null && values != null) {
+                for (int i = 0; i < fields.length; i++) {
+                    if (i > 0)
                         data += "&";
 
                     System.out.println(values[i]);
@@ -62,7 +81,7 @@ public class URLConnector {
             /**
              * Accept GZip if applicable
              */
-            if(conn.getContentEncoding() != null && conn.getContentEncoding().equals("gzip"))
+            if (conn.getContentEncoding() != null && conn.getContentEncoding().equals("gzip"))
                 rd = new BufferedReader(new InputStreamReader(new GZIPInputStream(conn.getInputStream())));
             else
                 rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -79,7 +98,9 @@ public class URLConnector {
             url = null;
             rd = null;
             conn = null;
-        }catch(Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return html;
     }

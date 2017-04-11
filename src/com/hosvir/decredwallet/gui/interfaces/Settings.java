@@ -1,10 +1,10 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
-import com.hosvir.decredwallet.Constants;
-import com.hosvir.decredwallet.gui.*;
 import com.deadendgine.Engine;
 import com.deadendgine.utils.MathUtils;
+import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.gui.Button;
+import com.hosvir.decredwallet.gui.*;
 import com.hosvir.decredwallet.gui.Component;
 import com.hosvir.decredwallet.gui.Dialog;
 import com.hosvir.decredwallet.gui.Label;
@@ -20,8 +20,8 @@ public class Settings extends Interface {
     @Override
     public void init() {
         rectangles = new Rectangle[3];
-        for(int i = 0; i < rectangles.length; i++){
-            rectangles[i] = new Rectangle(i*170,60,170,70);
+        for (int i = 0; i < rectangles.length; i++) {
+            rectangles[i] = new Rectangle(i * 170, 60, 170, 70);
         }
 
         this.components.add(new Label("langLabel", Constants.getLangValue("Language-Label"), 40, 190));
@@ -34,11 +34,11 @@ public class Settings extends Interface {
         DropdownBox dropbox = new DropdownBox("langSelect", 250, 170, Engine.getWidth() - 295, 30, Constants.getLangFiles().toArray(new String[Constants.getLangFiles().size()]));
         dropbox.text = Constants.langFile;
 
-        InputBox doubleClickBox = new InputBox("doubleClickDelayInput", 250,210,Engine.getWidth() - 295,30);
-        InputBox scrollDistanceInput = new InputBox("scrollDistanceInput", 250,250,Engine.getWidth() - 295,30);
-        InputBox maxLogInput = new InputBox("maxLogLinesInput", 250,290,Engine.getWidth() - 295,30);
-        InputBox fpsMaxInput = new InputBox("fpsMaxInput", 250,330,Engine.getWidth() - 295,30);
-        InputBox fpsMinInput = new InputBox("fpsMinInput", 250,370,Engine.getWidth() - 295,30);
+        InputBox doubleClickBox = new InputBox("doubleClickDelayInput", 250, 210, Engine.getWidth() - 295, 30);
+        InputBox scrollDistanceInput = new InputBox("scrollDistanceInput", 250, 250, Engine.getWidth() - 295, 30);
+        InputBox maxLogInput = new InputBox("maxLogLinesInput", 250, 290, Engine.getWidth() - 295, 30);
+        InputBox fpsMaxInput = new InputBox("fpsMaxInput", 250, 330, Engine.getWidth() - 295, 30);
+        InputBox fpsMinInput = new InputBox("fpsMinInput", 250, 370, Engine.getWidth() - 295, 30);
 
         doubleClickBox.text = String.valueOf(Constants.doubleClickDelay);
         scrollDistanceInput.text = String.valueOf(Constants.scrollDistance);
@@ -60,41 +60,41 @@ public class Settings extends Interface {
     @Override
     public synchronized void update(long delta) {
         //Allow diag closing
-        if(getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
+        if (getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
 
         //Update rectangles
         super.update(delta);
 
-        switch(selectedId){
+        switch (selectedId) {
             case 0: //Main
-                if(!blockInput) {
-                    if(blockComponents) blockComponents = false;
+                if (!blockInput) {
+                    if (blockComponents) blockComponents = false;
 
                     //For each component
-                    for(Component c : components) {
-                        if(selectedId == 0 && c.containsMouse) Main.containsMouse = true;
+                    for (Component c : components) {
+                        if (selectedId == 0 && c.containsMouse) Main.containsMouse = true;
 
                         //Drop down
-                        if(c instanceof DropdownBox) {
-                            if(!c.text.replace(".conf", "").contains(Constants.langFile)) {
+                        if (c instanceof DropdownBox) {
+                            if (!c.text.replace(".conf", "").contains(Constants.langFile)) {
                                 Constants.langFile = c.text.replace(".conf", "");
                                 Constants.reloadLanguage();
                             }
                         }
 
                         //Input
-                        if(c instanceof InputBox) {
-                            if(c.clickCount > 0) Constants.unselectOtherInputs(components, c);
+                        if (c instanceof InputBox) {
+                            if (c.clickCount > 0) Constants.unselectOtherInputs(components, c);
                         }
 
                         //Button
-                        if(c instanceof Button) {
-                            if(c.selectedId == 0){
-                                if(!MathUtils.isNumeric(getComponentByName("doubleClickDelayInput").text) |
+                        if (c instanceof Button) {
+                            if (c.selectedId == 0) {
+                                if (!MathUtils.isNumeric(getComponentByName("doubleClickDelayInput").text) |
                                         !MathUtils.isNumeric(getComponentByName("scrollDistanceInput").text) |
                                         !MathUtils.isNumeric(getComponentByName("maxLogLinesInput").text) |
                                         !MathUtils.isNumeric(getComponentByName("fpsMaxInput").text) |
-                                        !MathUtils.isNumeric(getComponentByName("fpsMinInput").text)){
+                                        !MathUtils.isNumeric(getComponentByName("fpsMinInput").text)) {
 
                                     getComponentByName("errordiag").text = Constants.getLangValue("Integer-Error");
 
@@ -103,7 +103,7 @@ public class Settings extends Interface {
                                     Constants.navbar.blockInput = true;
                                     getComponentByName("errordiag").selectedId = 0;
 
-                                }else{
+                                } else {
                                     Constants.doubleClickDelay = Integer.valueOf(getComponentByName("doubleClickDelayInput").text);
                                     Constants.scrollDistance = Integer.valueOf(getComponentByName("scrollDistanceInput").text);
                                     Constants.maxLogLines = Integer.valueOf(getComponentByName("maxLogLinesInput").text);
@@ -127,7 +127,7 @@ public class Settings extends Interface {
                 }
                 break;
             default:
-                if(!blockComponents) blockComponents = true;
+                if (!blockComponents) blockComponents = true;
                 Constants.unselectAllInputs(components);
                 break;
         }
@@ -135,7 +135,7 @@ public class Settings extends Interface {
 
     @Override
     public synchronized void render(Graphics2D g) {
-        switch(selectedId){
+        switch (selectedId) {
             case 0: //Main
                 //Content box
                 g.drawImage(Images.getInterfaces()[6],
@@ -184,10 +184,10 @@ public class Settings extends Interface {
                 60,
                 null);
 
-        for(int i = 0; i < rectangles.length; i++){
+        for (int i = 0; i < rectangles.length; i++) {
             g.setColor(ColorConstants.settingsSelectedColor);
 
-            if(selectedId == i || hoverId == i){
+            if (selectedId == i || hoverId == i) {
                 g.fillRect(rectangles[i].x,
                         rectangles[i].y,
                         rectangles[i].width,
@@ -207,7 +207,7 @@ public class Settings extends Interface {
         g.drawString(Constants.getLangValue("Network-Button-Text"), (170 * 3) - 85 - (g.getFontMetrics().stringWidth(Constants.getLangValue("Network-Button-Text")) / 2), 105);
 
 
-        if(selectedId == 0){
+        if (selectedId == 0) {
             //Render
             super.render(g);
 

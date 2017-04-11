@@ -10,10 +10,6 @@ import com.hosvir.decredwallet.websockets.DecredEndpoint;
  */
 public class DecredWallet {
 
-    public static void main(String[] args) {
-        new DecredWallet();
-    }
-
     public DecredWallet() {
         //Setup constants
         Constants.initialise();
@@ -28,5 +24,9 @@ public class DecredWallet {
 
         //Launch GUI
         Constants.setMainGui(new Main());
+    }
+
+    public static void main(String[] args) {
+        new DecredWallet();
     }
 }

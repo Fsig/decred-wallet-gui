@@ -17,15 +17,16 @@ public class Button extends Component {
         this.hoverColor = hoverColor;
 
         this.rectangles = new Rectangle[1];
-        this.rectangles[0] = new Rectangle(x,y,width,height);
+        this.rectangles[0] = new Rectangle(x, y, width, height);
 
         this.selectedId = -1;
     }
 
     @Override
     public void render(Graphics2D g) {
-        if(hoverId != -1) g.setColor(hoverColor); else g.setColor(borderColor);
-        if(!enabled) g.setColor(disabledColor);
+        if (hoverId != -1) g.setColor(hoverColor);
+        else g.setColor(borderColor);
+        if (!enabled) g.setColor(disabledColor);
 
         g.fillRoundRect(x, y, width, height, 10, 10);
 
@@ -36,7 +37,7 @@ public class Button extends Component {
 
     @Override
     public void resize() {
-        for(Rectangle r : rectangles){
+        for (Rectangle r : rectangles) {
             r.x = x;
             r.y = y;
             r.width = width;

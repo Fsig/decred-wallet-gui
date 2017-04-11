@@ -55,11 +55,12 @@ public abstract class Component extends BaseGui {
 
     @Override
     public void update(long delta) {
-        if(enabled) super.update(delta);
+        if (enabled) super.update(delta);
     }
 
     @Override
-    public void resize() {}
+    public void resize() {
+    }
 
     public String getName() {
         return name;

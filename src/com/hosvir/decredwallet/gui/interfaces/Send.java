@@ -1,13 +1,13 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
+import com.deadendgine.Engine;
+import com.deadendgine.input.Mouse;
 import com.hosvir.decredwallet.Account;
 import com.hosvir.decredwallet.Api;
 import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.Contact;
-import com.hosvir.decredwallet.gui.*;
-import com.deadendgine.Engine;
-import com.deadendgine.input.Mouse;
 import com.hosvir.decredwallet.gui.Button;
+import com.hosvir.decredwallet.gui.*;
 import com.hosvir.decredwallet.gui.Component;
 import com.hosvir.decredwallet.gui.Dialog;
 
@@ -37,11 +37,11 @@ public class Send extends Interface {
         send.enabled = false;
 
 
-        InputBox from = new InputBox("from", 500,200,Engine.getWidth() - 545,30);
-        InputBox to = new InputBox("to", 500,250,Engine.getWidth() - 545,30);
-        InputBox comment = new InputBox("comment", 500,300,Engine.getWidth() - 545,80);
-        InputBox fee = new InputBox("fee", 500,400,Engine.getWidth() - 545,30);
-        InputBox amount = new InputBox("amount", 500,450,Engine.getWidth() - 545,30);
+        InputBox from = new InputBox("from", 500, 200, Engine.getWidth() - 545, 30);
+        InputBox to = new InputBox("to", 500, 250, Engine.getWidth() - 545, 30);
+        InputBox comment = new InputBox("comment", 500, 300, Engine.getWidth() - 545, 80);
+        InputBox fee = new InputBox("fee", 500, 400, Engine.getWidth() - 545, 30);
+        InputBox amount = new InputBox("amount", 500, 450, Engine.getWidth() - 545, 30);
 
         from.enabled = false;
         comment.enabled = false;
@@ -62,15 +62,15 @@ public class Send extends Interface {
     @Override
     public void update(long delta) {
         //Allow diag closing
-        if(getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
+        if (getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
 
-        if(!blockInput){
-            if(rectangles == null && Constants.accounts.size() > 0){
+        if (!blockInput) {
+            if (rectangles == null && Constants.accounts.size() > 0) {
                 rectangles = new Rectangle[Constants.accounts.size()];
 
-                for(int i = 0; i < rectangles.length; i++){
+                for (int i = 0; i < rectangles.length; i++) {
                     rectangles[i] = new Rectangle(0,
-                            60 + i*60,
+                            60 + i * 60,
                             295,
                             60);
                 }
@@ -80,61 +80,67 @@ public class Send extends Interface {
             super.update(delta);
 
             //Assign name to input box
-            if(getComponentByName("from").text != Constants.accounts.get(selectedId).name)
+            if (getComponentByName("from").text != Constants.accounts.get(selectedId).name) {
                 getComponentByName("from").text = Constants.accounts.get(selectedId).name;
+            }
 
             //Set fee
-            if(getComponentByName("fee").text == "0.00") getComponentByName("fee").text = "" + Constants.globalCache.walletFee;
+            if (getComponentByName("fee").text == "0.00") {
+                getComponentByName("fee").text = "" + Constants.globalCache.walletFee;
+            }
 
             //Enable send
-            if(getComponentByName("to").text != "" && getComponentByName("fee").text != "" && getComponentByName("amount").text != "")
-                getComponentByName("send").enabled = true; else getComponentByName("send").enabled = false;
+            if (getComponentByName("to").text != "" && getComponentByName("fee").text != "" && getComponentByName("amount").text != "") {
+                getComponentByName("send").enabled = true;
+            } else {
+                getComponentByName("send").enabled = false;
+            }
 
 
             //Check for sending
-            if(Constants.isPrivatePassphraseSet() && getComponentByName("to").text != "") {
-                if(getComponentByName("fee").text != Api.getWalletFee()){
-                    if(Api.setTxFee(getComponentByName("fee").text)){
+            if (Constants.isPrivatePassphraseSet() && getComponentByName("to").text != "") {
+                if (getComponentByName("fee").text != Api.getWalletFee()) {
+                    if (Api.setTxFee(getComponentByName("fee").text)) {
                         readyToSend = true;
-                    }else{
+                    } else {
                         readyToSend = false;
                     }
-                }else{
+                } else {
                     readyToSend = true;
                 }
 
-                if(readyToSend){
+                if (readyToSend) {
                     //Check if sending to contact
-                    if(Constants.isContact(getComponentByName("to").text)){
+                    if (Constants.isContact(getComponentByName("to").text)) {
                         to = Constants.getContact(getComponentByName("to").text).getAddress();
-                    }else if(getComponentByName("to").text.contains(",")){
+                    } else if (getComponentByName("to").text.contains(",")) {
                         sendMany = true;
                         to = getComponentByName("to").text;
-                    }else{
+                    } else {
                         to = getComponentByName("to").text;
                     }
 
                     //Unlock wallet
                     String unlock = Api.unlockWallet("30");
 
-                    if(unlock != null && !unlock.contains("-14")){
+                    if (unlock != null && !unlock.contains("-14")) {
                         String txId = null;
 
-                        if(sendMany) {
+                        if (sendMany) {
                             txId = Api.sendMany(getComponentByName("from").text,
                                     to,
                                     getComponentByName("comment").text,
                                     getComponentByName("amount").text);
-                        }else {
+                        } else {
                             txId = Api.sendFrom(getComponentByName("from").text,
                                     to,
                                     getComponentByName("comment").text,
                                     getComponentByName("amount").text);
                         }
 
-                        if(txId == "" || txId.contains("Address count must equal")){
+                        if (txId == "" || txId.contains("Address count must equal")) {
                             Constants.log("Unable to send DCR. " + txId);
-                        }else if(txId.contains("-32603")){
+                        } else if (txId.contains("-32603")) {
                             Constants.log("Insufficient funds: " + txId);
                             getComponentByName("errordiag").text = Constants.getLangValue("Insufficient-Funds-Error");
 
@@ -142,7 +148,7 @@ public class Send extends Interface {
                             this.blockInput = true;
                             Constants.navbar.blockInput = true;
                             getComponentByName("errordiag").selectedId = 0;
-                        }else{
+                        } else {
                             Constants.log("Sucess, transaction id: " + txId);
                             Constants.setClipboardString(txId);
                             getComponentByName("errordiag").text = Constants.getLangValue("Clipboard-Message") + ": " + txId;
@@ -155,7 +161,7 @@ public class Send extends Interface {
                             Constants.forceUpdateAllAccounts();
                             Constants.globalCache.forceUpdate = true;
                         }
-                    }else{
+                    } else {
                         Constants.log("Error: " + unlock);
                         getComponentByName("errordiag").text = Constants.getLangValue("Error") + " " + unlock;
 
@@ -164,7 +170,7 @@ public class Send extends Interface {
                         Constants.navbar.blockInput = true;
                         getComponentByName("errordiag").selectedId = 0;
                     }
-                }else{
+                } else {
                     Constants.log("Unable to set Wallet fee, sending cancelled.");
                 }
 
@@ -172,7 +178,7 @@ public class Send extends Interface {
                 Constants.setPrivatePassPhrase(null);
 
                 //Force update accounts
-                for(Account a : Constants.accounts) a.forceUpdate = true;
+                for (Account a : Constants.accounts) a.forceUpdate = true;
                 Constants.globalCache.forceUpdate = true;
 
                 //Reset form
@@ -181,13 +187,13 @@ public class Send extends Interface {
             }
 
             //For each component
-            for(Component c : components) {
-                if(c.containsMouse) Main.containsMouse = true;
+            for (Component c : components) {
+                if (c.containsMouse) Main.containsMouse = true;
 
                 //Buttons
-                if(c instanceof Button) {
-                    if(c.selectedId == 0 && c.enabled){
-                        switch(c.name){
+                if (c instanceof Button) {
+                    if (c.selectedId == 0 && c.enabled) {
+                        switch (c.name) {
                             case "cancel":
                                 resetForm();
                                 break;
@@ -195,7 +201,7 @@ public class Send extends Interface {
                                 blockInput = true;
                                 Constants.navbar.blockInput = true;
                                 Constants.unselectAllInputs(components);
-                                Constants.guiInterfaces.get(Constants.guiInterfaces.size() -1).selectedId = 0;
+                                Constants.guiInterfaces.get(Constants.guiInterfaces.size() - 1).selectedId = 0;
                                 break;
                         }
 
@@ -205,25 +211,25 @@ public class Send extends Interface {
                 }
 
                 //Input boxes
-                if(c instanceof InputBox) {
+                if (c instanceof InputBox) {
 
                     //Check for similar contact
-                    if(c.getName() == "to"){
-                        if(c.text.trim() != "" && c.selectedId == 0) {
-                            for(Contact cc : Constants.contacts) {
-                                if(cc.getName().toLowerCase().contains(getComponentByName("to").text.toLowerCase())){
-                                    if(!suggestions.contains(cc.getName())) suggestions.add(cc.getName());
-                                }else{
-                                    if(suggestions.contains(cc.getName())) suggestions.remove(cc.getName());
+                    if (c.getName() == "to") {
+                        if (c.text.trim() != "" && c.selectedId == 0) {
+                            for (Contact cc : Constants.contacts) {
+                                if (cc.getName().toLowerCase().contains(getComponentByName("to").text.toLowerCase())) {
+                                    if (!suggestions.contains(cc.getName())) suggestions.add(cc.getName());
+                                } else {
+                                    if (suggestions.contains(cc.getName())) suggestions.remove(cc.getName());
                                 }
 
                                 //Loop over each suggestion
-                                for(int i = 0; i < suggestions.size(); i++){
-                                    if(new Rectangle(500, 281 + i*35, Engine.getWidth() - 545, 35).contains(Mouse.point)){
+                                for (int i = 0; i < suggestions.size(); i++) {
+                                    if (new Rectangle(500, 281 + i * 35, Engine.getWidth() - 545, 35).contains(Mouse.point)) {
                                         containsMouse = true;
                                         hoverSuggestionId = i;
 
-                                        if(Mouse.isMouseDown(MouseEvent.BUTTON1)) {
+                                        if (Mouse.isMouseDown(MouseEvent.BUTTON1)) {
                                             c.text = suggestions.get(i);
                                             c.selectedId = -1;
                                             Mouse.release(MouseEvent.BUTTON1);
@@ -231,18 +237,18 @@ public class Send extends Interface {
                                     }
                                 }
 
-                                if(!containsMouse) hoverSuggestionId = -1;
+                                if (!containsMouse) hoverSuggestionId = -1;
                             }
                         }
                     }
 
-                    if(c.clickCount > 0) Constants.unselectOtherInputs(components, c);
+                    if (c.clickCount > 0) Constants.unselectOtherInputs(components, c);
                 }
             }
 
 
             //Rename account
-            if(doubleClicked && !Constants.accounts.get(selectedId).name.startsWith("default") && !Constants.accounts.get(selectedId).name.startsWith("imported")){
+            if (doubleClicked && !Constants.accounts.get(selectedId).name.startsWith("default") && !Constants.accounts.get(selectedId).name.startsWith("imported")) {
                 Constants.accountToRename = Constants.accounts.get(selectedId).name;
                 blockInput = true;
                 Constants.navbar.blockInput = true;
@@ -281,11 +287,11 @@ public class Send extends Interface {
                 null);
 
 
-        if(rectangles != null){
-            for(int i = 0; i < rectangles.length; i++){
+        if (rectangles != null) {
+            for (int i = 0; i < rectangles.length; i++) {
                 //Selected wallet
                 g.setColor(ColorConstants.settingsSelectedColor);
-                if(i == selectedId || i == hoverId){
+                if (i == selectedId || i == hoverId) {
                     g.fillRect(rectangles[i].x,
                             rectangles[i].y,
                             rectangles[i].width,
@@ -300,17 +306,17 @@ public class Send extends Interface {
                 //Wallet Labels
                 g.setColor(ColorConstants.walletNameColor);
                 g.setFont(FontConstants.walletNameFont);
-                g.drawString(Constants.accounts.get(i).name, 6, 98 + i*60);
+                g.drawString(Constants.accounts.get(i).name, 6, 98 + i * 60);
 
 
                 //Wallet Balance
                 g.setColor(ColorConstants.walletBalanceColor);
                 g.setFont(FontConstants.walletBalanceFont);
-                g.drawString("" + Constants.accounts.get(i).totalBalance, 285 - g.getFontMetrics().stringWidth("" + Constants.accounts.get(i).totalBalance), 98 + i*60);
+                g.drawString("" + Constants.accounts.get(i).totalBalance, 285 - g.getFontMetrics().stringWidth("" + Constants.accounts.get(i).totalBalance), 98 + i * 60);
             }
         }
 
-        if(Constants.accounts.size() > 0){
+        if (Constants.accounts.size() > 0) {
             //DCR and Balance
             g.setColor(ColorConstants.walletBalanceColor);
             g.setFont(FontConstants.dcrFont);
@@ -378,7 +384,7 @@ public class Send extends Interface {
             super.render(g);
 
             //Suggestions
-            if(getComponentByName("to").selectedId == 0 && getComponentByName("to").text.trim() != ""){
+            if (getComponentByName("to").selectedId == 0 && getComponentByName("to").text.trim() != "") {
                 g.setColor(Color.WHITE);
                 g.fillRect(500,
                         281,
@@ -393,9 +399,10 @@ public class Send extends Interface {
 
                 g.setFont(FontConstants.settingsFont);
 
-                for(int i = 0; i < suggestions.size(); i++){
-                    if(hoverSuggestionId == i) g.setColor(ColorConstants.flatBlue); else g.setColor(ColorConstants.labelColor);
-                    g.drawString(suggestions.get(i), 500 + 10, 271 + ((i+1) * 35));
+                for (int i = 0; i < suggestions.size(); i++) {
+                    if (hoverSuggestionId == i) g.setColor(ColorConstants.flatBlue);
+                    else g.setColor(ColorConstants.labelColor);
+                    g.drawString(suggestions.get(i), 500 + 10, 271 + ((i + 1) * 35));
                 }
             }
         }
@@ -412,8 +419,8 @@ public class Send extends Interface {
         getComponentByName("send").resize();
 
         //Resize input boxes
-        for(Component c : components) {
-            if(c instanceof InputBox){
+        for (Component c : components) {
+            if (c instanceof InputBox) {
                 c.width = Engine.getWidth() - 545;
                 c.resize();
             }
@@ -430,8 +437,8 @@ public class Send extends Interface {
      * Reset all the fields on the form.
      */
     public void resetForm() {
-        for(Component c : components)
-            if(c instanceof InputBox)
+        for (Component c : components)
+            if (c instanceof InputBox)
                 c.text = "";
 
         getComponentByName("fee").text = "" + Constants.globalCache.walletFee;

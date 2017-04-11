@@ -15,17 +15,17 @@ public abstract class Interface extends BaseGui {
     @Override
     public void update(long delta) {
         super.update(delta);
-        if(!blockComponents) for(Component c : components) c.update(delta);
+        if (!blockComponents) for (Component c : components) c.update(delta);
     }
 
     @Override
     public void render(Graphics2D g) {
-        for(Component c : components) c.render(g);
+        for (Component c : components) c.render(g);
     }
 
     @Override
     public void resize() {
-        for(Component c : components) c.resize();
+        for (Component c : components) c.resize();
     }
 
     /**
@@ -35,8 +35,8 @@ public abstract class Interface extends BaseGui {
      * @return Component
      */
     public Component getComponentByName(String name) {
-        for(Component c : components)
-            if(c.name == name)
+        for (Component c : components)
+            if (c.name == name)
                 return c;
 
         return null;

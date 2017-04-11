@@ -33,11 +33,11 @@ public class LinkLabel extends Component {
         g.setFont(textFont);
         g.drawString(text, x, y);
 
-        if(rectangles[0] == null){
-            rectangles[0] = new Rectangle(x,y - g.getFontMetrics().getHeight() + 2,g.getFontMetrics().stringWidth(text),g.getFontMetrics().getHeight());
+        if (rectangles[0] == null) {
+            rectangles[0] = new Rectangle(x, y - g.getFontMetrics().getHeight() + 2, g.getFontMetrics().stringWidth(text), g.getFontMetrics().getHeight());
         }
 
-        g.drawLine(rectangles[0].x, rectangles[0].y + g.getFontMetrics().getHeight(), rectangles[0].x + rectangles[0].width -2, rectangles[0].y + g.getFontMetrics().getHeight());
+        g.drawLine(rectangles[0].x, rectangles[0].y + g.getFontMetrics().getHeight(), rectangles[0].x + rectangles[0].width - 2, rectangles[0].y + g.getFontMetrics().getHeight());
     }
 
     @Override

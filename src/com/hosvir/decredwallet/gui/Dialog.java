@@ -1,7 +1,7 @@
 package com.hosvir.decredwallet.gui;
 
-import com.hosvir.decredwallet.Constants;
 import com.deadendgine.Engine;
+import com.hosvir.decredwallet.Constants;
 
 import java.awt.*;
 
@@ -34,12 +34,12 @@ public class Dialog extends Component {
     public void update(long delta) {
         super.update(delta);
 
-        if(isActive()){
+        if (isActive()) {
             okButton.update(delta);
 
-            if(okButton.containsMouse) Main.containsMouse = true;
+            if (okButton.containsMouse) Main.containsMouse = true;
 
-            if(okButton.selectedId == 0){
+            if (okButton.selectedId == 0) {
                 okButton.selectedId = -1;
                 Constants.blockInterfaces(false, null);
                 this.selectedId = -1;
@@ -49,7 +49,7 @@ public class Dialog extends Component {
 
     @Override
     public void render(Graphics2D g) {
-        if(isActive()){
+        if (isActive()) {
             g.setColor(ColorConstants.transparentBlack);
             g.fillRect(0, 0, Engine.getWidth(), Engine.getHeight());
 

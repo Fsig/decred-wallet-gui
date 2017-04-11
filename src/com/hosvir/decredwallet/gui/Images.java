@@ -25,7 +25,7 @@ public class Images {
     /**
      * Load the images.
      */
-    public static void init(){
+    public static void init() {
         icon = ImageUtils.loadBufferedImage("resources/icon.png");
         logo = ImageUtils.loadBufferedImage("resources/logo.png");
         logoSmall = ImageUtils.loadBufferedImage("resources/logo-small.png");
@@ -43,9 +43,13 @@ public class Images {
         return icon;
     }
 
-    public static BufferedImage getLogo() { return logo; }
+    public static BufferedImage getLogo() {
+        return logo;
+    }
 
-    public static BufferedImage getLogoSmall() { return logoSmall; }
+    public static BufferedImage getLogoSmall() {
+        return logoSmall;
+    }
 
     public static BufferedImage[] getIcons() {
         return icons;
@@ -75,5 +79,7 @@ public class Images {
         return arrowDown;
     }
 
-    public static BufferedImage getLoginBg() { return loginBg; }
+    public static BufferedImage getLoginBg() {
+        return loginBg;
+    }
 }

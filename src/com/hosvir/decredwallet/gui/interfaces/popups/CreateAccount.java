@@ -1,9 +1,12 @@
 package com.hosvir.decredwallet.gui.interfaces.popups;
 
+import com.deadendgine.Engine;
 import com.hosvir.decredwallet.Api;
 import com.hosvir.decredwallet.Constants;
-import com.deadendgine.Engine;
 import com.hosvir.decredwallet.gui.*;
+import com.hosvir.decredwallet.gui.Button;
+import com.hosvir.decredwallet.gui.Component;
+import com.hosvir.decredwallet.gui.Dialog;
 
 import java.awt.*;
 
@@ -15,13 +18,16 @@ import java.awt.*;
 public class CreateAccount extends Interface {
     public void init() {
         selectedId = -1;
-        InputBox passphrase = new InputBox("passphrase", (Engine.getWidth() / 2) - 250,(Engine.getHeight() / 2) + 40,500,30);
+        InputBox passphrase = new InputBox("passphrase", (Engine.getWidth() / 2) - 250, (Engine.getHeight() / 2) + 40, 500, 30);
         passphrase.textHidden = true;
 
-        this.components.add(new InputBox("account", (Engine.getWidth() / 2) - 250,Engine.getHeight() / 2,500,30));
+        this.components.add(new InputBox("account", (Engine.getWidth() / 2) - 250, Engine.getHeight() / 2, 500, 30));
         this.components.add(passphrase);
-        this.components.add(new com.hosvir.decredwallet.gui.Button("cancel", Constants.getLangValue("Cancel-Button-Text"), 30, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatRed, ColorConstants.flatRedHover));
-        this.components.add(new com.hosvir.decredwallet.gui.Button("confirm", Constants.getLangValue("Confirm-Button-Text"), Engine.getWidth() - 130, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+        this.components.add(new Button("cancel", Constants.getLangValue("Cancel-Button-Text"), 30, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatRed, ColorConstants.flatRedHover));
+        this.components.add(new Button("confirm", Constants.getLangValue("Confirm-Button-Text"), Engine.getWidth() - 130, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+
+        this.components.add(new Dialog("errordiag", ""));
+        getComponentByName("errordiag").width = 800;
     }
 
     @Override
@@ -30,13 +36,13 @@ public class CreateAccount extends Interface {
         super.update(delta);
 
         //For each component
-        for(com.hosvir.decredwallet.gui.Component c : components) {
-            if(c.containsMouse && c.enabled) Main.containsMouse = true;
+        for (Component c : components) {
+            if (c.containsMouse && c.enabled) Main.containsMouse = true;
 
             //Buttons
-            if(c instanceof com.hosvir.decredwallet.gui.Button) {
-                if(c.selectedId == 0){
-                    switch(c.name){
+            if (c instanceof Button) {
+                if (c.selectedId == 0) {
+                    switch (c.name) {
                         case "cancel":
                             Constants.blockInterfaces(false, this);
                             getComponentByName("account").text = "";
@@ -47,15 +53,29 @@ public class CreateAccount extends Interface {
                             break;
                         case "confirm":
                             Constants.setPrivatePassPhrase(getComponentByName("passphrase").text);
-                            Api.unlockWallet("30");
-                            Api.createNewAccount(getComponentByName("account").text);
-                            Constants.reloadAccounts();
-                            Constants.blockInterfaces(false, this);
-                            getComponentByName("account").text = "";
-                            getComponentByName("account").selectedId = -1;
-                            getComponentByName("passphrase").text = "";
-                            getComponentByName("passphrase").selectedId = -1;
-                            this.selectedId = -1;
+
+                            //Unlock wallet
+                            String unlock = Api.unlockWallet("30");
+
+                            if (unlock == null || unlock.contains("-14")) {
+                                Constants.log("Error: " + unlock);
+                                getComponentByName("errordiag").text = Constants.getLangValue("Error") + " " + unlock;
+
+                                //Show dialog
+                                this.blockInput = true;
+                                Constants.navbar.blockInput = true;
+                                getComponentByName("errordiag").selectedId = 0;
+                                return;
+                            } else {
+                                Api.createNewAccount(getComponentByName("account").text);
+                                Constants.reloadAccounts();
+                                Constants.blockInterfaces(false, this);
+                                getComponentByName("account").text = "";
+                                getComponentByName("account").selectedId = -1;
+                                getComponentByName("passphrase").text = "";
+                                getComponentByName("passphrase").selectedId = -1;
+                                this.selectedId = -1;
+                            }
                             break;
                     }
                 }
@@ -64,8 +84,8 @@ public class CreateAccount extends Interface {
             }
 
             //Input boxes
-            if(c instanceof InputBox) {
-                if(c.clickCount > 0) Constants.unselectOtherInputs(components, c);
+            if (c instanceof InputBox) {
+                if (c.clickCount > 0) Constants.unselectOtherInputs(components, c);
             }
         }
     }

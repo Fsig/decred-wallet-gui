@@ -28,7 +28,7 @@ public class ReloadButton extends Component {
         this.animateCounter = 0;
         this.animateTimer = new Timer(80);
         this.rectangles = new Rectangle[1];
-        this.rectangles[0] = new Rectangle(x,y,width,height);
+        this.rectangles[0] = new Rectangle(x, y, width, height);
 
         this.selectedId = -1;
     }
@@ -36,19 +36,19 @@ public class ReloadButton extends Component {
     public void update(long delta) {
         super.update(delta);
 
-        if(selectedId == 0 && animateTimer.isUp()) {
-            if(animateCounter == 0) animateCounter = 6;
+        if (selectedId == 0 && animateTimer.isUp()) {
+            if (animateCounter == 0) animateCounter = 6;
             animateCounter++;
             animateTimer.reset();
-            if(animateCounter >= Images.getLoading().length) animateCounter = 6;
-        }else if(selectedId == -1) {
+            if (animateCounter >= Images.getLoading().length) animateCounter = 6;
+        } else if (selectedId == -1) {
             animateCounter = 0;
         }
     }
 
     @Override
     public void render(Graphics2D g) {
-        if(hoverId != -1 && selectedId == -1) animateCounter = 6;
+        if (hoverId != -1 && selectedId == -1) animateCounter = 6;
 
         g.drawImage(Images.getLoading()[animateCounter],
                 x,
@@ -60,7 +60,7 @@ public class ReloadButton extends Component {
 
     @Override
     public void resize() {
-        for(Rectangle r : rectangles){
+        for (Rectangle r : rectangles) {
             r.x = x;
             r.y = y;
             r.width = width;

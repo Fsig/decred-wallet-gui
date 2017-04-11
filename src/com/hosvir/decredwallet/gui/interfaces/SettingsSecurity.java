@@ -1,9 +1,12 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
+import com.deadendgine.Engine;
 import com.hosvir.decredwallet.Api;
 import com.hosvir.decredwallet.Constants;
-import com.deadendgine.Engine;
 import com.hosvir.decredwallet.gui.*;
+import com.hosvir.decredwallet.gui.Button;
+import com.hosvir.decredwallet.gui.Dialog;
+import com.hosvir.decredwallet.gui.Label;
 
 import java.awt.*;
 
@@ -15,30 +18,30 @@ import java.awt.*;
 public class SettingsSecurity extends Interface {
     @Override
     public void init() {
-        this.components.add(new com.hosvir.decredwallet.gui.Label("addressLabel", Constants.getLangValue("Address-Label"), 40, 190));
-        this.components.add(new com.hosvir.decredwallet.gui.Label("oldPassphraseLabel", Constants.getLangValue("Old-Passphrase-Label"), 40, 280));
-        this.components.add(new com.hosvir.decredwallet.gui.Label("newPassphraseLabel", Constants.getLangValue("New-Passphrase-Label"), 40, 330));
-        this.components.add(new com.hosvir.decredwallet.gui.Label("confirmPassphraseLabel", Constants.getLangValue("Confirm-Passphrase-Label"), 40, 380));
+        this.components.add(new Label("addressLabel", Constants.getLangValue("Address-Label"), 40, 190));
+        this.components.add(new Label("oldPassphraseLabel", Constants.getLangValue("Old-Passphrase-Label"), 40, 280));
+        this.components.add(new Label("newPassphraseLabel", Constants.getLangValue("New-Passphrase-Label"), 40, 330));
+        this.components.add(new Label("confirmPassphraseLabel", Constants.getLangValue("Confirm-Passphrase-Label"), 40, 380));
 
-        InputBox oldPassphraseInput = new InputBox("oldPassphraseInput", 250,260, Engine.getWidth() - 295,30);
-        InputBox newPassphraseInput = new InputBox("newPassphraseInput", 250,310,Engine.getWidth() - 295,30);
-        InputBox confirmPassphraseInput = new InputBox("confirmPassphraseInput", 250,360,Engine.getWidth() - 295,30);
+        InputBox oldPassphraseInput = new InputBox("oldPassphraseInput", 250, 260, Engine.getWidth() - 295, 30);
+        InputBox newPassphraseInput = new InputBox("newPassphraseInput", 250, 310, Engine.getWidth() - 295, 30);
+        InputBox confirmPassphraseInput = new InputBox("confirmPassphraseInput", 250, 360, Engine.getWidth() - 295, 30);
         oldPassphraseInput.textHidden = true;
         newPassphraseInput.textHidden = true;
         confirmPassphraseInput.textHidden = true;
 
-        com.hosvir.decredwallet.gui.Button dumpButton = new com.hosvir.decredwallet.gui.Button("dumpWallet", "Dump wallet", Engine.getWidth() - 190, Engine.getHeight() - 130, 150, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover);
+        Button dumpButton = new Button("dumpWallet", "Dump wallet", Engine.getWidth() - 190, Engine.getHeight() - 130, 150, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover);
         dumpButton.enabled = false;
 
         this.components.add(oldPassphraseInput);
         this.components.add(newPassphraseInput);
         this.components.add(confirmPassphraseInput);
-        this.components.add(new InputBox("addressInput", 250,170,Engine.getWidth() - 520,30));
-        this.components.add(new com.hosvir.decredwallet.gui.Button("dumpPrivateKey", Constants.getLangValue("Dump-Private-Key-Button-Text"), Engine.getWidth() - 240, 170, 200, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
-        this.components.add(new com.hosvir.decredwallet.gui.Button("changePassphrase", Constants.getLangValue("Change-Passphrase-Button-Text"), Engine.getWidth() - 240, 410, 200, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
-        this.components.add(new com.hosvir.decredwallet.gui.Button("getMasterPublicKey", Constants.getLangValue("Get-Master-Public-Key-Button-Text"), 40, Engine.getHeight() - 130, 220, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+        this.components.add(new InputBox("addressInput", 250, 170, Engine.getWidth() - 520, 30));
+        this.components.add(new Button("dumpPrivateKey", Constants.getLangValue("Dump-Private-Key-Button-Text"), Engine.getWidth() - 240, 170, 200, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+        this.components.add(new Button("changePassphrase", Constants.getLangValue("Change-Passphrase-Button-Text"), Engine.getWidth() - 240, 410, 200, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+        this.components.add(new Button("getMasterPublicKey", Constants.getLangValue("Get-Master-Public-Key-Button-Text"), 40, Engine.getHeight() - 130, 220, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
         this.components.add(dumpButton);
-        this.components.add(new com.hosvir.decredwallet.gui.Dialog("errordiag", ""));
+        this.components.add(new Dialog("errordiag", ""));
 
         selectedId = -1;
     }
@@ -46,22 +49,22 @@ public class SettingsSecurity extends Interface {
     @Override
     public synchronized void update(long delta) {
         //Allow diag closing
-        if(getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
+        if (getComponentByName("errordiag").isActive()) getComponentByName("errordiag").update(delta);
 
-        if(!blockInput) {
+        if (!blockInput) {
             super.update(delta);
 
             //Check for dump private key
-            if(Constants.isPrivatePassphraseSet() && getComponentByName("addressInput").text != "") {
+            if (Constants.isPrivatePassphraseSet() && getComponentByName("addressInput").text != "") {
                 //Unlock wallet
                 String unlock = Api.unlockWallet("30");
 
-                if(unlock == null | unlock.trim().length() < 1){
+                if (unlock == null | unlock.trim().length() < 1) {
                     String address = Api.dumpPrivateKey(getComponentByName("addressInput").text);
 
-                    if(address.toLowerCase().contains("invalid")){
+                    if (address.toLowerCase().contains("invalid")) {
                         getComponentByName("errordiag").text = Constants.getLangValue("Error") + " " + address;
-                    }else{
+                    } else {
                         Constants.setClipboardString(address);
 
                         //Set dialog
@@ -72,7 +75,7 @@ public class SettingsSecurity extends Interface {
                     this.blockInput = true;
                     Constants.navbar.blockInput = true;
                     getComponentByName("errordiag").selectedId = 0;
-                }else{
+                } else {
                     Constants.log("Error: " + unlock);
                     getComponentByName("errordiag").text = Constants.getLangValue("Error") + " " + unlock;
 
@@ -86,40 +89,40 @@ public class SettingsSecurity extends Interface {
             }
 
             //For each component
-            for(com.hosvir.decredwallet.gui.Component c : components) {
-                if(c.containsMouse) Main.containsMouse = true;
+            for (com.hosvir.decredwallet.gui.Component c : components) {
+                if (c.containsMouse) Main.containsMouse = true;
 
                 //Input
-                if(c instanceof InputBox) {
-                    if(c.clickCount > 0) Constants.unselectOtherInputs(components, c);
+                if (c instanceof InputBox) {
+                    if (c.clickCount > 0) Constants.unselectOtherInputs(components, c);
                 }
 
                 //Button
-                if(c instanceof com.hosvir.decredwallet.gui.Button) {
-                    if(c.selectedId == 0 && c.enabled){
+                if (c instanceof com.hosvir.decredwallet.gui.Button) {
+                    if (c.selectedId == 0 && c.enabled) {
                         System.out.println("Pressed button: " + c.name);
 
-                        switch(c.name){
+                        switch (c.name) {
                             case "dumpPrivateKey":
                                 blockInput = true;
                                 Constants.navbar.blockInput = true;
                                 Constants.unselectAllInputs(components);
-                                Constants.guiInterfaces.get(Constants.guiInterfaces.size() -1).selectedId = 0;
+                                Constants.guiInterfaces.get(Constants.guiInterfaces.size() - 1).selectedId = 0;
                                 break;
                             case "changePassphrase":
-                                if(!getComponentByName("newPassphraseInput").text.contains(getComponentByName("confirmPassphraseInput").text)){
+                                if (!getComponentByName("newPassphraseInput").text.contains(getComponentByName("confirmPassphraseInput").text)) {
                                     getComponentByName("errordiag").text = Constants.getLangValue("Passphrase-Mismatch-Error");
-                                }else{
+                                } else {
                                     String changed = Api.walletPassphraseChange(getComponentByName("oldPassphraseInput").text, getComponentByName("newPassphraseInput").text);
 
-                                    if(changed == null | changed.trim().length() < 1){
+                                    if (changed == null | changed.trim().length() < 1) {
                                         getComponentByName("errordiag").text = Constants.getLangValue("Passphrase-Changed-Message");
                                         getComponentByName("oldPassphraseInput").text = "";
                                         getComponentByName("newPassphraseInput").text = "";
                                         getComponentByName("confirmPassphraseInput").text = "";
 
                                         Constants.unselectAllInputs(components);
-                                    }else{
+                                    } else {
                                         Constants.log("Error: " + changed);
                                         getComponentByName("errordiag").text = Constants.getLangValue("Error") + " " + changed;
                                     }

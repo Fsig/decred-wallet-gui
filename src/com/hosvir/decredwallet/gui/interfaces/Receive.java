@@ -1,10 +1,12 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
-import com.hosvir.decredwallet.Api;
-import com.hosvir.decredwallet.Constants;
 import com.deadendgine.Engine;
 import com.deadendgine.input.Mouse;
+import com.hosvir.decredwallet.Api;
+import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.gui.*;
+import com.hosvir.decredwallet.gui.Button;
+import com.hosvir.decredwallet.gui.Dialog;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -17,11 +19,11 @@ import java.awt.event.MouseWheelListener;
  * @since 20/03/17
  */
 public class Receive extends Interface implements MouseWheelListener {
+    public int receiveHoverId = -1;
     private int headerThird;
     private String newAddress;
     private int scrollOffset = 0;
     private Rectangle[] receiveRectangles;
-    public int receiveHoverId = -1;
     private int scrollMinHeight = 160;
     private int scrollMaxHeight;
     private double scrollCurrentPosition = 160;
@@ -30,8 +32,8 @@ public class Receive extends Interface implements MouseWheelListener {
     public void init() {
         headerThird = (Engine.getWidth() - 200) / 4;
 
-        this.components.add(new com.hosvir.decredwallet.gui.Button("new", Constants.getLangValue("Get-New-Button-Text"), Engine.getWidth() - 150, 200, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
-        this.components.add(new com.hosvir.decredwallet.gui.Dialog("newaddr", Constants.getLangValue("New-Address-Message")));
+        this.components.add(new Button("new", Constants.getLangValue("Get-New-Button-Text"), Engine.getWidth() - 150, 200, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+        this.components.add(new Dialog("newaddr", Constants.getLangValue("New-Address-Message")));
 
         scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
 
@@ -43,22 +45,22 @@ public class Receive extends Interface implements MouseWheelListener {
         //Update
         super.update(delta);
 
-        if(!blockInput){
-            if(rectangles == null && Constants.accounts.size() > 0){
+        if (!blockInput) {
+            if (rectangles == null && Constants.accounts.size() > 0) {
                 rectangles = new Rectangle[Constants.accounts.size()];
 
-                for(int i = 0; i < rectangles.length; i++){
+                for (int i = 0; i < rectangles.length; i++) {
                     rectangles[i] = new Rectangle(0,
-                            60 + i*60,
+                            60 + i * 60,
                             295,
                             60);
                 }
             }
 
             //Get new address
-            if(getComponentByName("new").containsMouse) Main.containsMouse = true;
+            if (getComponentByName("new").containsMouse) Main.containsMouse = true;
 
-            if(getComponentByName("new").selectedId == 0 ){
+            if (getComponentByName("new").selectedId == 0) {
                 newAddress = Api.getNewAddress(Constants.accounts.get(selectedId).name).trim();
                 Constants.setClipboardString(newAddress);
 
@@ -77,7 +79,7 @@ public class Receive extends Interface implements MouseWheelListener {
             }
 
             //Rename account
-            if(doubleClicked && !Constants.accounts.get(selectedId).name.startsWith("default") && !Constants.accounts.get(selectedId).name.startsWith("imported")){
+            if (doubleClicked && !Constants.accounts.get(selectedId).name.startsWith("default") && !Constants.accounts.get(selectedId).name.startsWith("imported")) {
                 Constants.accountToRename = Constants.accounts.get(selectedId).name;
                 blockInput = true;
                 Constants.navbar.blockInput = true;
@@ -87,21 +89,21 @@ public class Receive extends Interface implements MouseWheelListener {
 
 
         //Receive rectangles
-        if(receiveRectangles == null && Constants.accounts.get(selectedId).addresses != null && Constants.accounts.get(selectedId).addresses.length > 0){
+        if (receiveRectangles == null && Constants.accounts.get(selectedId).addresses != null && Constants.accounts.get(selectedId).addresses.length > 0) {
             receiveRectangles = new Rectangle[Constants.accounts.get(selectedId).addresses.length];
 
-            for(int i = 0; i < receiveRectangles.length; i++){
-                receiveRectangles[i] = new Rectangle(340, 198 + i*30 - scrollOffset, 450,20);
+            for (int i = 0; i < receiveRectangles.length; i++) {
+                receiveRectangles[i] = new Rectangle(340, 198 + i * 30 - scrollOffset, 450, 20);
             }
         }
 
-        if(receiveRectangles != null){
-            for(int i = 0; i < receiveRectangles.length; i++){
-                if(receiveRectangles[i] != null && receiveRectangles[i].contains(Mouse.point)){
+        if (receiveRectangles != null) {
+            for (int i = 0; i < receiveRectangles.length; i++) {
+                if (receiveRectangles[i] != null && receiveRectangles[i].contains(Mouse.point)) {
                     containsMouse = true;
                     receiveHoverId = i;
 
-                    if(Mouse.isMouseDown(MouseEvent.BUTTON1)){
+                    if (Mouse.isMouseDown(MouseEvent.BUTTON1)) {
                         Constants.setClipboardString(Constants.accounts.get(selectedId).addresses[receiveHoverId].trim());
                         getComponentByName("newaddr").text = Constants.getLangValue("Clipboard-Message") + ": " + Constants.getClipboardString();
 
@@ -115,7 +117,7 @@ public class Receive extends Interface implements MouseWheelListener {
                 }
             }
 
-            if(!containsMouse) receiveHoverId = -1;
+            if (!containsMouse) receiveHoverId = -1;
         }
 
 
@@ -156,19 +158,22 @@ public class Receive extends Interface implements MouseWheelListener {
         g.setColor(ColorConstants.walletBalanceColor);
         g.setFont(FontConstants.addressFont);
 
-        for(int i = 0; i < Constants.accounts.get(selectedId).addresses.length; i++) {
-            if(215 + i*30 - scrollOffset < Engine.getHeight() - 70 && 215 + i*30 - scrollOffset > 200) {
-                if(receiveHoverId == i) g.setColor(ColorConstants.flatBlue); else g.setColor(ColorConstants.walletBalanceColor);
+        if (Constants.accounts.get(selectedId).addresses != null) {
+            for (int i = 0; i < Constants.accounts.get(selectedId).addresses.length; i++) {
+                if (215 + i * 30 - scrollOffset < Engine.getHeight() - 70 && 215 + i * 30 - scrollOffset > 200) {
+                    if (receiveHoverId == i) g.setColor(ColorConstants.flatBlue);
+                    else g.setColor(ColorConstants.walletBalanceColor);
 
-                g.drawString(Constants.accounts.get(selectedId).addresses[i], 340, 215 + i*30 - scrollOffset);
+                    g.drawString(Constants.accounts.get(selectedId).addresses[i], 340, 215 + i * 30 - scrollOffset);
+                }
             }
-        }
 
-        //Scroll bar
-        if(Constants.accounts.get(selectedId).addresses.length > 0) {
-            g.setColor(Color.LIGHT_GRAY);
-            g.drawLine(Engine.getWidth() - 10, 100, Engine.getWidth() - 10, Engine.getHeight());
-            g.fillRect(Engine.getWidth() - 10, (int)scrollCurrentPosition, 10, 60);
+            //Scroll bar
+            if (Constants.accounts.get(selectedId).addresses.length > 0) {
+                g.setColor(Color.LIGHT_GRAY);
+                g.drawLine(Engine.getWidth() - 10, 100, Engine.getWidth() - 10, Engine.getHeight());
+                g.fillRect(Engine.getWidth() - 10, (int) scrollCurrentPosition, 10, 60);
+            }
         }
 
         //Header
@@ -199,11 +204,11 @@ public class Receive extends Interface implements MouseWheelListener {
                 null);
 
 
-        if(rectangles != null){
-            for(int i = 0; i < rectangles.length; i++){
+        if (rectangles != null) {
+            for (int i = 0; i < rectangles.length; i++) {
                 //Selected wallet
                 g.setColor(ColorConstants.settingsSelectedColor);
-                if(i == selectedId || i == hoverId){
+                if (i == selectedId || i == hoverId) {
                     g.fillRect(rectangles[i].x,
                             rectangles[i].y,
                             rectangles[i].width,
@@ -218,19 +223,18 @@ public class Receive extends Interface implements MouseWheelListener {
                 //Wallet Labels
                 g.setColor(ColorConstants.walletNameColor);
                 g.setFont(FontConstants.walletNameFont);
-                g.drawString(Constants.accounts.get(i).name, 6, 98 + i*60);
+                g.drawString(Constants.accounts.get(i).name, 6, 98 + i * 60);
 
 
                 //Wallet Balance
                 g.setColor(ColorConstants.walletBalanceColor);
                 g.setFont(FontConstants.walletBalanceFont);
-                g.drawString("" + Constants.accounts.get(i).totalBalance, 285 - g.getFontMetrics().stringWidth("" + Constants.accounts.get(i).totalBalance), 98 + i*60);
+                g.drawString("" + Constants.accounts.get(i).totalBalance, 285 - g.getFontMetrics().stringWidth("" + Constants.accounts.get(i).totalBalance), 98 + i * 60);
             }
         }
 
 
-
-        if(Constants.accounts.size() > 0){
+        if (Constants.accounts.size() > 0) {
             //DCR and Balance
             g.setColor(ColorConstants.walletBalanceColor);
             g.setFont(FontConstants.dcrFont);
@@ -280,24 +284,25 @@ public class Receive extends Interface implements MouseWheelListener {
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if(isActive()){
-            if(e.getUnitsToScroll() > 0){
+        if (isActive()) {
+            if (e.getUnitsToScroll() > 0) {
                 scrollOffset += Constants.scrollDistance;
-                if(Constants.accounts.get(selectedId).addresses.length > 1)
-                    scrollCurrentPosition += (Engine.getHeight() - scrollMinHeight - 60) / (Constants.accounts.get(selectedId).addresses.length -1);
-            }else{
+                if (Constants.accounts.get(selectedId).addresses.length > 1)
+                    scrollCurrentPosition += (Engine.getHeight() - scrollMinHeight - 60) / (Constants.accounts.get(selectedId).addresses.length - 1);
+            } else {
                 scrollOffset -= Constants.scrollDistance;
-                if(Constants.accounts.get(selectedId).addresses.length > 1)
-                    scrollCurrentPosition -= (Engine.getHeight() - scrollMinHeight - 60) / (Constants.accounts.get(selectedId).addresses.length -1);
+                if (Constants.accounts.get(selectedId).addresses.length > 1)
+                    scrollCurrentPosition -= (Engine.getHeight() - scrollMinHeight - 60) / (Constants.accounts.get(selectedId).addresses.length - 1);
             }
 
-            if(scrollOffset < 0) scrollOffset = 0;
-            if(scrollOffset > (Constants.accounts.get(selectedId).addresses.length-1)*30) scrollOffset = (Constants.accounts.get(selectedId).addresses.length-1)*30;
+            if (scrollOffset < 0) scrollOffset = 0;
+            if (scrollOffset > (Constants.accounts.get(selectedId).addresses.length - 1) * 30)
+                scrollOffset = (Constants.accounts.get(selectedId).addresses.length - 1) * 30;
 
-            if(Constants.accounts.get(selectedId).addresses.length > 0){
+            if (Constants.accounts.get(selectedId).addresses.length > 0) {
                 scrollMaxHeight = Engine.getHeight() - (scrollMinHeight / 2) - 35;
-                if(scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
-                if(scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
+                if (scrollCurrentPosition < scrollMinHeight) scrollCurrentPosition = scrollMinHeight;
+                if (scrollCurrentPosition > scrollMaxHeight) scrollCurrentPosition = scrollMaxHeight;
             }
 
             receiveRectangles = null;

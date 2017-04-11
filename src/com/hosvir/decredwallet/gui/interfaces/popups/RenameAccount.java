@@ -1,9 +1,10 @@
 package com.hosvir.decredwallet.gui.interfaces.popups;
 
+import com.deadendgine.Engine;
 import com.hosvir.decredwallet.Api;
 import com.hosvir.decredwallet.Constants;
-import com.deadendgine.Engine;
 import com.hosvir.decredwallet.gui.*;
+import com.hosvir.decredwallet.gui.Button;
 
 import java.awt.*;
 
@@ -16,9 +17,9 @@ public class RenameAccount extends Interface {
     public void init() {
         selectedId = -1;
 
-        this.components.add(new InputBox("account", (Engine.getWidth() / 2) - 250,Engine.getHeight() / 2,500,30));
-        this.components.add(new com.hosvir.decredwallet.gui.Button("cancel", Constants.getLangValue("Cancel-Button-Text"), 30, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatRed, ColorConstants.flatRedHover));
-        this.components.add(new com.hosvir.decredwallet.gui.Button("confirm", Constants.getLangValue("Confirm-Button-Text"), Engine.getWidth() - 130, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
+        this.components.add(new InputBox("account", (Engine.getWidth() / 2) - 250, Engine.getHeight() / 2, 500, 30));
+        this.components.add(new Button("cancel", Constants.getLangValue("Cancel-Button-Text"), 30, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatRed, ColorConstants.flatRedHover));
+        this.components.add(new Button("confirm", Constants.getLangValue("Confirm-Button-Text"), Engine.getWidth() - 130, (Engine.getHeight() / 2) + 50, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover));
     }
 
     @Override
@@ -27,12 +28,12 @@ public class RenameAccount extends Interface {
         super.update(delta);
 
         //For each component
-        for(com.hosvir.decredwallet.gui.Component c : components) {
-            if(c.containsMouse && c.enabled) Main.containsMouse = true;
+        for (com.hosvir.decredwallet.gui.Component c : components) {
+            if (c.containsMouse && c.enabled) Main.containsMouse = true;
 
-            if(c instanceof com.hosvir.decredwallet.gui.Button) {
-                if(c.selectedId == 0){
-                    switch(c.name){
+            if (c instanceof com.hosvir.decredwallet.gui.Button) {
+                if (c.selectedId == 0) {
+                    switch (c.name) {
                         case "cancel":
                             Constants.navbar.blockInput = false;
                             Constants.blockInterfaces(false, this);

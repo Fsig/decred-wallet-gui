@@ -14,15 +14,10 @@ import java.util.Collections;
  * @since 19/03/17
  */
 public class GlobalCache extends Thread implements Updatable {
-    private boolean running;
     public boolean forceUpdate;
     public boolean forceUpdateInfo;
     public boolean forceUpdatePeers;
     public boolean forceUpdateTickets;
-    private Timer updateTimer = new Timer(1000);
-    private Timer infoTimer = new Timer(1000);
-    private Timer peerTimer = new Timer(1000);
-    private Timer ticketTimer = new Timer(1000);
     public String walletFee = "0.00";
     public JSONArray transactions;
     public JSONObject info;
@@ -30,6 +25,11 @@ public class GlobalCache extends Thread implements Updatable {
     public JSONObject stakeInfo;
     public JSONArray peers;
     public ArrayList<Ticket> tickets;
+    private boolean running;
+    private Timer updateTimer = new Timer(5000);
+    private Timer infoTimer = new Timer(5000);
+    private Timer peerTimer = new Timer(5000);
+    private Timer ticketTimer = new Timer(5000);
     private TicketComparator tc = new TicketComparator();
 
     public GlobalCache() {
@@ -43,13 +43,13 @@ public class GlobalCache extends Thread implements Updatable {
     public void run() {
         running = true;
 
-        while(running){
-            if(Constants.isWalletReady())
+        while (running) {
+            if (Constants.isWalletReady())
                 update(0);
 
             try {
                 Thread.sleep(1000);
-            }catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -58,33 +58,52 @@ public class GlobalCache extends Thread implements Updatable {
     @Override
     public void update(long delta) {
         try {
-            if(updateTimer.isUp() || forceUpdate){
-                walletFee = Api.getWalletFee();
-                transactions = Api.getTransactions();
+            if (updateTimer.isUp() || forceUpdate) {
+                String tempWalletFee = Api.getWalletFee();
+                if (tempWalletFee != null) {
+                    walletFee = tempWalletFee;
+                }
 
-                if(updateTimer.timeLimit <= 10000) updateTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+                JSONArray tempTransactions = Api.getTransactions();
+                if (tempTransactions != null) {
+                    transactions = tempTransactions;
+                }
+
+                if (updateTimer.timeLimit <= 10000) {
+                    updateTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+                }
+
                 updateTimer.reset();
                 forceUpdate = false;
+
+                //Load pools
+                if (Constants.pools.size() < 1) {
+                    Constants.reloadPools();
+                }
             }
 
             //Info update
-            if(infoTimer.isUp() || forceUpdateInfo){
+            if (infoTimer.isUp() || forceUpdateInfo) {
                 info = Api.getInfo();
                 currentBlock = Api.getBlock(Api.getBlockHash(String.valueOf(info.get("blocks"))));
                 stakeInfo = Api.getStakeInfo();
 
-                if(infoTimer.timeLimit <= 10000) infoTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+                if (infoTimer.timeLimit <= 10000) {
+                    infoTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+                }
                 infoTimer.reset();
                 forceUpdateInfo = false;
             }
 
             //Peer update
-            if(peerTimer.isUp() || forceUpdatePeers){
+            if (peerTimer.isUp() || forceUpdatePeers) {
                 Api.ping();
                 peers = Api.getPeerInfo();
                 Constants.guiInterfaces.get(6).resize();
 
-                if(peerTimer.timeLimit <= 10000) peerTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+                if (peerTimer.timeLimit <= 10000) {
+                    peerTimer.timeLimit = Constants.getRandomNumber(10000, 45000);
+                }
                 peerTimer.reset();
                 forceUpdatePeers = false;
             }
@@ -105,11 +124,13 @@ public class GlobalCache extends Thread implements Updatable {
                     Collections.sort(tickets, tc);
                 }
 
-                if(ticketTimer.timeLimit <= 10000) ticketTimer.timeLimit = Constants.getRandomNumber(30000, 85000);
+                if (ticketTimer.timeLimit <= 10000) {
+                    ticketTimer.timeLimit = Constants.getRandomNumber(30000, 85000);
+                }
                 ticketTimer.reset();
                 forceUpdateTickets = false;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

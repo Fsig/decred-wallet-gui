@@ -1,13 +1,5 @@
 package com.hosvir.decredwallet.gui;
 
-import com.hosvir.decredwallet.Account;
-import com.hosvir.decredwallet.Api;
-import com.hosvir.decredwallet.Constants;
-import com.hosvir.decredwallet.Processes;
-import com.hosvir.decredwallet.gui.interfaces.popups.AddContact;
-import com.hosvir.decredwallet.gui.interfaces.popups.CreateAccount;
-import com.hosvir.decredwallet.gui.interfaces.popups.Passphrase;
-import com.hosvir.decredwallet.gui.interfaces.popups.RenameAccount;
 import com.deadendgine.BaseGame;
 import com.deadendgine.Engine;
 import com.deadendgine.GameFrame;
@@ -15,7 +7,15 @@ import com.deadendgine.GameState;
 import com.deadendgine.graphics.GameCanvas;
 import com.deadendgine.input.Keyboard;
 import com.deadendgine.input.Mouse;
+import com.hosvir.decredwallet.Account;
+import com.hosvir.decredwallet.Api;
+import com.hosvir.decredwallet.Constants;
+import com.hosvir.decredwallet.Processes;
 import com.hosvir.decredwallet.gui.interfaces.*;
+import com.hosvir.decredwallet.gui.interfaces.popups.AddContact;
+import com.hosvir.decredwallet.gui.interfaces.popups.CreateAccount;
+import com.hosvir.decredwallet.gui.interfaces.popups.Passphrase;
+import com.hosvir.decredwallet.gui.interfaces.popups.RenameAccount;
 
 import java.awt.*;
 import java.util.Iterator;
@@ -26,41 +26,35 @@ import java.util.Iterator;
  * @since 19/03/17
  */
 public class Main extends BaseGame {
-    //---------------------Thread variables-----------------
-    private Thread gameThread;
-    public static int UPDATE_RATE = 30;
-    private long UPDATE_PERIOD = 1000L / UPDATE_RATE;
+    public static int UPDATE_RATE = 60;
     public static long beginTime, timeTaken, timeLeft, lastLoopTime, delta;
-    //------------------------------------------------------
-
-    //----------------------FPS / DELTA---------------------
-    public int FPS = 0;
-    private int FRAMES = 0;
-    private long totalTime = 0;
-    private long curTime = System.currentTimeMillis();
-    private long lastTime = curTime;
-    //------------------------------------------------------
-
     //-------------------Canvas / Frame---------------------
     public static GameFrame frame;
     public static GameCanvas canvas;
     //------------------------------------------------------
-
-    //-------------------Variables--------------------------
-    public GameState state = GameState.INITILISING;
     public static boolean fullscreen = false;
-
     //Keyboard and Mouse
     public static Keyboard keyboard = null;
     public static Mouse mouse = null;
-
     //Volume
     public static float volume = 1.0f;
     public static boolean sound = true;
-
+    //------------------------------------------------------
     public static boolean containsMouse = false;
     public static boolean haveInit = false;
+    //------------------------------------------------------
     public static boolean exiting = false;
+    //----------------------FPS / DELTA---------------------
+    public int FPS = 0;
+    //-------------------Variables--------------------------
+    public GameState state = GameState.INITILISING;
+    //---------------------Thread variables-----------------
+    private Thread gameThread;
+    private long UPDATE_PERIOD = 1000L / UPDATE_RATE;
+    private int FRAMES = 0;
+    private long totalTime = 0;
+    private long curTime = System.currentTimeMillis();
+    private long lastTime = curTime;
 
     /**
      * Constructor
@@ -69,7 +63,7 @@ public class Main extends BaseGame {
         init();
 
         //Create a new thread to run the game in
-        gameThread = new Thread(){
+        gameThread = new Thread() {
 
             /**
              * Default run method for the thread.
@@ -78,7 +72,7 @@ public class Main extends BaseGame {
              * the game.
              */
             @Override
-            public void run(){
+            public void run() {
                 loop();
                 interrupt();
                 quit();
@@ -100,10 +94,10 @@ public class Main extends BaseGame {
         Engine.setGame(this);
 
         //Set the width and height to be used for window
-        Engine.setPreferedWidth(1200);
-        Engine.setPreferedHeight(700);
-        Engine.setWidth(1200);
-        Engine.setHeight(700);
+        Engine.setPreferedWidth(1280);
+        Engine.setPreferedHeight(750);
+        Engine.setWidth(1280);
+        Engine.setHeight(750);
         Engine.setMinimumWidth(1100);
         Engine.setMinimumHeight(600);
 
@@ -112,7 +106,7 @@ public class Main extends BaseGame {
         //Create a frame with our canvas
         frame = new GameFrame("Decred Wallet", canvas);
         frame.setResizable(true);
-        frame.setMinimumSize(new Dimension(Engine.getMinimumWidth(),Engine.getMinimumHeight()));
+        frame.setMinimumSize(new Dimension(Engine.getMinimumWidth(), Engine.getMinimumHeight()));
         canvas.setBackground(ColorConstants.loggedinBackgroundColor);
 
         //Initialise the canvas
@@ -151,7 +145,11 @@ public class Main extends BaseGame {
         Constants.guiInterfaces.add(new Passphrase());
 
         Constants.navbar.init();
-        for(BaseGui bg : Constants.guiInterfaces) bg.init();
+
+        for (BaseGui bg : Constants.guiInterfaces) {
+            bg.init();
+        }
+
         haveInit = true;
 
         frame.revalidate();
@@ -164,14 +162,14 @@ public class Main extends BaseGame {
         state = GameState.MAIN_MENU;
         lastLoopTime = System.currentTimeMillis();
 
-        while(true){
-            try{
+        while (true) {
+            try {
                 //Calculate FPS and time
                 lastTime = curTime;
                 curTime = System.currentTimeMillis();
                 totalTime += curTime - lastTime;
 
-                if(totalTime > 1000){
+                if (totalTime > 1000) {
                     totalTime -= 1000;
                     FPS = FRAMES;
                     FRAMES = 0;
@@ -194,11 +192,14 @@ public class Main extends BaseGame {
                 timeLeft = (UPDATE_PERIOD - timeTaken);
 
                 //Sleep for remaining time
-                try{
-                    if(timeLeft > -1)
+                try {
+                    if (timeLeft > -1) {
                         Thread.sleep(timeLeft);
-                }catch(InterruptedException ex){break;}
-            }catch(Exception e){
+                    }
+                } catch (InterruptedException ex) {
+                    break;
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -210,39 +211,36 @@ public class Main extends BaseGame {
         containsMouse = false;
 
         //Adjust FPS to reduce load when not in use
-        if(!canvas.hasFocus() && UPDATE_RATE != Constants.fpsMin){
+        if (!canvas.hasFocus() && UPDATE_RATE != Constants.fpsMin) {
             UPDATE_RATE = Constants.fpsMin;
             UPDATE_PERIOD = 1000L / UPDATE_RATE;
-        }else if(UPDATE_RATE != Constants.fpsMax) {
+        } else if (UPDATE_RATE != Constants.fpsMax) {
             UPDATE_RATE = Constants.fpsMax;
             UPDATE_PERIOD = 1000L / UPDATE_RATE;
         }
 
-        if(!Constants.isDaemonReady() || !Constants.isWalletReady()){
+        if (!Constants.isDaemonReady() || !Constants.isWalletReady()) {
             Constants.guiInterfaces.get(0).update(delta);
-            if(Constants.guiInterfaces.get(0).containsMouse) containsMouse = true;
+            if (Constants.guiInterfaces.get(0).containsMouse) {
+                containsMouse = true;
+            }
 
             //Restore cursor
-            if(!containsMouse){
+            if (!containsMouse) {
                 Main.frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }else{
+            } else {
                 Main.frame.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
-        }else{
-            if(Constants.accounts.size() == 0){
-                if(Api.getAccounts() != null)
-                    /*for(JsonObjects jos : Api.getAccounts().get(0).getJsonObjects()){
-                        if(!jos.getName().trim().equals("result")){
-                            Constants.accounts.add(new Account(jos.getName()));
-                            Constants.accountNames.add(jos.getName());
-                        }
-                    }*/
-
-                    for(Iterator iterator = Api.getAccounts().keySet().iterator(); iterator.hasNext();) {
+        } else {
+            //Load accounts
+            if (Constants.accounts.size() == 0) {
+                if (Api.getAccounts() != null) {
+                    for (Iterator iterator = Api.getAccounts().keySet().iterator(); iterator.hasNext(); ) {
                         String key = (String) iterator.next();
                         Constants.accounts.add(new Account(key));
                         Constants.accountNames.add(key);
                     }
+                }
 
                 Constants.globalCache.forceUpdateInfo = true;
                 Constants.globalCache.forceUpdatePeers = true;
@@ -250,40 +248,46 @@ public class Main extends BaseGame {
 
             //Update nav
             Constants.navbar.update(delta);
-            if(Constants.navbar.containsMouse) containsMouse = true;
+            if (Constants.navbar.containsMouse) containsMouse = true;
 
             //Update interfaces
-            for(BaseGui bg : Constants.guiInterfaces) {
-                if(bg.isActive()){
+            for (BaseGui bg : Constants.guiInterfaces) {
+                if (bg.isActive()) {
                     bg.update(delta);
 
-                    if(bg.containsMouse && !bg.blockInput) containsMouse = true;
+                    if (bg.containsMouse && !bg.blockInput) {
+                        containsMouse = true;
+                    }
                 }
             }
 
             //Restore cursor
-            if(!containsMouse){
+            if (!containsMouse) {
                 Main.frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }else{
+            } else {
                 Main.frame.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             //Cleanup logs, one log per update
-            if(Constants.getDaemonProcess() != null && Constants.getDaemonProcess().log.size() > Constants.maxLogLines) {
-                for(int i = 0; i < 100; i++)
+            if (Constants.getDaemonProcess() != null && Constants.getDaemonProcess().log.size() > Constants.maxLogLines) {
+                for (int i = 0; i < 100; i++) {
                     Constants.getDaemonProcess().log.remove(i);
+                }
             }
-            if(Constants.getWalletProcess() != null && Constants.getWalletProcess().log.size() > Constants.maxLogLines) {
-                for(int i = 0; i < 100; i++)
+            if (Constants.getWalletProcess() != null && Constants.getWalletProcess().log.size() > Constants.maxLogLines) {
+                for (int i = 0; i < 100; i++) {
                     Constants.getWalletProcess().log.remove(i);
+                }
             }
-            if(Constants.guiLog.size() > Constants.maxLogLines) {
-                for(int i = 0; i < 100; i++)
+            if (Constants.guiLog.size() > Constants.maxLogLines) {
+                for (int i = 0; i < 100; i++) {
                     Constants.guiLog.remove(i);
+                }
             }
-            if(Constants.rpcLog.size() > Constants.maxLogLines) {
-                for(int i = 0; i < 100; i++)
+            if (Constants.rpcLog.size() > Constants.maxLogLines) {
+                for (int i = 0; i < 100; i++) {
                     Constants.rpcLog.remove(i);
+                }
             }
         }
     }
@@ -295,20 +299,22 @@ public class Main extends BaseGame {
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        switch(state){
+        switch (state) {
             case INITILISING:
                 g.drawString("Loading...", (Engine.getWidth() / 2) - 30, (Engine.getHeight() / 2) - 30);
                 break;
             case MAIN_MENU:
-                if(Constants.isDaemonReady() && Constants.isWalletReady())
+                if (Constants.isDaemonReady() && Constants.isWalletReady()) {
                     Constants.navbar.render(g);
+                }
 
-                if(exiting) {
+                if (exiting) {
                     Constants.guiInterfaces.get(0).render(g);
-                }else{
-                    for(BaseGui bg : Constants.guiInterfaces) {
-                        if(bg.isActive())
+                } else {
+                    for (BaseGui bg : Constants.guiInterfaces) {
+                        if (bg.isActive()) {
                             bg.render(g);
+                        }
                     }
                 }
                 break;
@@ -316,10 +322,10 @@ public class Main extends BaseGame {
                 break;
         }
 
-        if(Constants.isEnableFps()){
+        if (Constants.isEnableFps()) {
             g.setColor(Color.WHITE);
             g.setFont(FontConstants.labelFont);
-            g.drawString("FPS: " + FPS, 80, 35);
+            g.drawString("FPS: " + FPS, 450, 35);
         }
     }
 
@@ -327,10 +333,12 @@ public class Main extends BaseGame {
     public void resize() {
         canvas.resize();
 
-        if(haveInit){
+        if (haveInit) {
             Constants.navbar.resize();
 
-            for(BaseGui bg : Constants.guiInterfaces) bg.resize();
+            for (BaseGui bg : Constants.guiInterfaces) {
+                bg.resize();
+            }
         }
     }
 
@@ -344,12 +352,12 @@ public class Main extends BaseGame {
         Constants.getDcrwalletEndpoint().disconnect();
 
         //Clean up after yourself, but only if we started it
-        if(Constants.getWalletProcess() != null) {
+        if (Constants.getWalletProcess() != null) {
             Login.addLoadingMessage("Stopping DCRWALLET process");
             Processes.killByName("dcrwallet");
         }
 
-        if(Constants.getDaemonProcess() != null) {
+        if (Constants.getDaemonProcess() != null) {
             Login.addLoadingMessage("Stopping DCRD process");
             Processes.killByName("dcrd");
         }

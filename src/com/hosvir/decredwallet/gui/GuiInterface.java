@@ -10,6 +10,8 @@ import com.deadendgine.graphics.Paintable;
  */
 public interface GuiInterface extends Paintable, Updatable {
     public void init();
+
     public void resize();
+
     public boolean isActive();
 }

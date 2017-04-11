@@ -1,6 +1,5 @@
 package com.hosvir.decredwallet;
 
-import com.hosvir.decredwallet.utils.Param;
 import com.deadendgine.utils.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -12,10 +11,14 @@ import org.json.simple.JSONObject;
  */
 public class Api {
     public synchronized static JSONObject getInfo() {
-        return (JSONObject) Constants.getDcrdEndpoint().callMethod(
-                "getinfo",
-                null
-        ).get("result");
+        try {
+            return (JSONObject) Constants.getDcrdEndpoint().callMethod(
+                    "getinfo",
+                    null
+            ).get("result");
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
 
     public synchronized static JSONArray getPeerInfo() {
@@ -37,7 +40,6 @@ public class Api {
     }
 
     public synchronized static void ping() {
-
         Constants.getDcrdEndpoint().callMethod(
                 "ping",
                 null
@@ -45,69 +47,97 @@ public class Api {
     }
 
     public synchronized static boolean existsLiveTicket(String ticketHash) {
-        return Boolean.valueOf(Constants.getDcrdEndpoint().callMethod(
-                "existsliveticket",
-                new Param[]{
-                        new Param(0,ticketHash)
-                }
-        ).get("result").toString());
+        try {
+            return Boolean.valueOf(Constants.getDcrdEndpoint().callMethod(
+                    "existsliveticket",
+                    new Param[]{
+                            new Param(0, ticketHash)
+                    }
+            ).get("result").toString());
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     public synchronized static JSONObject getBalances(String name) {
-        JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
-                "getbalance",
-                new Param[]{
-                        new Param(0, name)
-                }
-        ).get("result");
+        try {
+            JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
+                    "getbalance",
+                    new Param[]{
+                            new Param(0, name)
+                    }
+            ).get("result");
 
-        JSONArray results = (JSONArray) result.get("balances");
+            JSONArray results = (JSONArray) result.get("balances");
 
-        return (JSONObject) results.get(0);
+            return (JSONObject) results.get(0);
+        } catch (ClassCastException | NullPointerException e) {
+            return null;
+        }
     }
 
     public synchronized static String getBalance(String name) {
-        return Api.getBalances(name).get("total").toString();
+        try {
+            return Api.getBalances(name).get("total").toString();
+        } catch (NullPointerException e) {
+            return "0";
+        }
     }
 
     public synchronized static String getBalanceSpendable(String name) {
-        return Api.getBalances(name).get("spendable").toString();
+        try {
+            return Api.getBalances(name).get("spendable").toString();
+        } catch (NullPointerException e) {
+            return "0";
+        }
     }
 
     public synchronized static String getLockedBalance(String name) {
-        JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
-                "getbalance",
-                new Param[]{
-                        new Param(0, name),
-                        new Param(1, "0")
-                }
-        ).get("result");
+        try {
+            JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
+                    "getbalance",
+                    new Param[]{
+                            new Param(0, name),
+                            new Param(1, "0")
+                    }
+            ).get("result");
 
-        JSONArray results = (JSONArray) result.get("balances");
-        result = (JSONObject) results.get(0);
+            JSONArray results = (JSONArray) result.get("balances");
+            result = (JSONObject) results.get(0);
 
-        return result.get("lockedbytickets").toString();
+            return result.get("lockedbytickets").toString();
+        } catch (ClassCastException | NullPointerException e) {
+            return "0";
+        }
     }
 
     public synchronized static String getBalanceAll(String name) {
-        return Api.getBalances(name).get("total").toString();
+        try {
+            return Api.getBalances(name).get("total").toString();
+        } catch (NullPointerException e) {
+            return "0";
+        }
     }
 
     public synchronized static JSONArray getTransactions() {
-        return (JSONArray) Constants.getDcrwalletEndpoint().callMethod(
-                "listtransactions",
-                new Param[]{
-                        new Param(0, "*"),
-                        new Param(1, "9999")
-                }
-        ).get("result");
+        try {
+            return (JSONArray) Constants.getDcrwalletEndpoint().callMethod(
+                    "listtransactions",
+                    new Param[]{
+                            new Param(0, "*"),
+                            new Param(1, "9999")
+                    }
+            ).get("result");
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
 
     public synchronized static JSONObject getTransactions(String name) {
         return Constants.getDcrwalletEndpoint().callMethod(
                 "listtransactions",
                 new Param[]{
-                        new Param(0,name)
+                        new Param(0, name)
                 }
         );
     }
@@ -120,8 +150,19 @@ public class Api {
     }
 
     public synchronized static String getWalletFee() {
+        try {
+            return Constants.getDcrwalletEndpoint().callMethod(
+                    "getwalletfee",
+                    null
+            ).get("result").toString();
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    public synchronized static String getTicketFee() {
         return Constants.getDcrwalletEndpoint().callMethod(
-                "getwalletfee",
+                "getticketfee",
                 null
         ).get("result").toString();
     }
@@ -204,6 +245,15 @@ public class Api {
         ).get("result").toString());
     }
 
+    public synchronized static boolean setTicketFee(String fee) {
+        return Boolean.valueOf(Constants.getDcrwalletEndpoint().callMethod(
+                "setticketfee",
+                new Param[]{
+                        new Param(1, fee)
+                }
+        ).get("result").toString());
+    }
+
     public synchronized static String sendFrom(String name, String toAddress, String comment, String amount) {
         return Constants.getDcrwalletEndpoint().callMethod(
                 "sendfrom",
@@ -215,7 +265,7 @@ public class Api {
         ).get("result").toString();
     }
 
-    public synchronized static String sendMany(String name, String toAddresses, String comment, String amounts){
+    public synchronized static String sendMany(String name, String toAddresses, String comment, String amounts) {
         String jsonparam = "{";
         String[] naddresses = toAddresses.split(",");
         String[] namounts = amounts.split(",");
@@ -226,7 +276,7 @@ public class Api {
         }
 
         //Append values into json string
-        for (int i = 0; i < naddresses.length; i++){
+        for (int i = 0; i < naddresses.length; i++) {
             jsonparam += "'" + naddresses[i] + "':" + namounts[i] + ",";
         }
 
@@ -243,8 +293,11 @@ public class Api {
         ).get("result").toString();
     }
 
-    public synchronized static String purchaseTicket(String name, String spendLimit, String address, String numberOfTickets, String poolAddress, String poolFees) {
-        if (poolAddress == null || poolAddress == ""){
+    public synchronized static String purchaseTicket(String ticketFee, String name, String spendLimit, String address, String numberOfTickets, String poolAddress, String poolFees) {
+        //Attempt to set ticket fee
+        Api.setTicketFee(ticketFee);
+
+        if (poolAddress == null || poolAddress == "") {
             return Constants.getDcrwalletEndpoint().callMethod(
                     "purchaseticket",
                     new Param[]{
@@ -254,7 +307,7 @@ public class Api {
                             new Param(0, address),
                             new Param(1, numberOfTickets)
                     }
-            ).get("result").toString();
+            ).get("message").toString();
         } else {
             return Constants.getDcrwalletEndpoint().callMethod(
                     "purchaseticket",
@@ -267,7 +320,7 @@ public class Api {
                             new Param(0, poolAddress),
                             new Param(1, poolFees)
                     }
-            ).get("result").toString();
+            ).toString();
         }
     }
 
@@ -311,62 +364,80 @@ public class Api {
     }
 
     public synchronized static String validateAddress(String address) {
-        return Constants.getDcrwalletEndpoint().callMethod(
+        JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
                 "validateaddress",
                 new Param[]{
                         new Param(0, address)
                 }
-        ).get("pubkeyaddr").toString();
+        ).get("result");
+
+        return result.get("pubkeyaddr").toString();
     }
 
     public synchronized static String importScript(String script) {
-        String result = Constants.getDcrwalletEndpoint().callMethod(
+        JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
                 "importscript",
                 new Param[]{
                         new Param(0, script)
                 }
-        ).get("result").toString();
+        ).get("result");
 
         Constants.setPrivatePassPhrase(null);
 
-        return result;
+        return result != null ? result.toString() : "";
     }
 
     public synchronized static String getTickets(boolean includeImmature) {
-        JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
-                "gettickets",
-                new Param[]{
-                        new Param(1, String.valueOf(includeImmature))
-                }
-        ).get("result");
+        try {
+            JSONObject result = (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
+                    "gettickets",
+                    new Param[]{
+                            new Param(1, String.valueOf(includeImmature))
+                    }
+            ).get("result");
 
-        return result.get("hashes").toString();
+            return result.get("hashes") != null ? result.get("hashes").toString() : null;
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
 
     public synchronized static JSONObject getTransaction(String txHash) {
-        return (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
-                "gettransaction",
-                new Param[]{
-                        new Param(0, txHash)
-                }
-        ).get("result");
+        try {
+            return (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
+                    "gettransaction",
+                    new Param[]{
+                            new Param(0, txHash)
+                    }
+            ).get("result");
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
 
     public synchronized static JSONObject getBlock(String blockHash) {
-        return (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
-                "getblock",
-                new Param[]{
-                        new Param(0, blockHash)
-                }
-        ).get("result");
+        try {
+            return (JSONObject) Constants.getDcrwalletEndpoint().callMethod(
+                    "getblock",
+                    new Param[]{
+                            new Param(0, blockHash)
+                    }
+            ).get("result");
+        } catch (ClassCastException | NullPointerException e) {
+            return null;
+        }
     }
 
     public synchronized static String getBlockHash(String blockIndex) {
-        return Constants.getDcrwalletEndpoint().callMethod(
-                "getblockhash",
-                new Param[]{
-                        new Param(1,blockIndex)
-                }
-        ).get("result").toString();
+        try {
+            return Constants.getDcrwalletEndpoint().callMethod(
+                    "getblockhash",
+                    new Param[]{
+                            new Param(1, blockIndex)
+                    }
+            ).get("result").toString();
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 }

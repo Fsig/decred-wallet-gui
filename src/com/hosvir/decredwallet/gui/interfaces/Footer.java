@@ -1,12 +1,12 @@
 package com.hosvir.decredwallet.gui.interfaces;
 
+import com.deadendgine.Engine;
 import com.hosvir.decredwallet.Constants;
 import com.hosvir.decredwallet.gui.BaseGui;
 import com.hosvir.decredwallet.gui.ColorConstants;
 import com.hosvir.decredwallet.gui.FontConstants;
 import com.hosvir.decredwallet.gui.Images;
 import com.hosvir.decredwallet.utils.TimeUtils;
-import com.deadendgine.Engine;
 import org.json.simple.JSONObject;
 
 import java.awt.*;
@@ -19,21 +19,21 @@ import java.util.Iterator;
  */
 public class Footer extends BaseGui {
     @Override
-    public void init(){
+    public void init() {
         selectedId = -1;
 
         rectangles = new Rectangle[4];
 
-        rectangles[0] = new Rectangle(8,Engine.getHeight() - 58,32,32);
-        rectangles[1] = new Rectangle(Engine.getWidth() - 374,Engine.getHeight() - 58,32,32);
-        rectangles[2] = new Rectangle(Engine.getWidth() - 267,Engine.getHeight() - 58,32,32);
-        rectangles[3] = new Rectangle(Engine.getWidth() - 141,Engine.getHeight() - 58,32,32);
+        rectangles[0] = new Rectangle(8, Engine.getHeight() - 58, 32, 32);
+        rectangles[1] = new Rectangle(Engine.getWidth() - 374, Engine.getHeight() - 58, 32, 32);
+        rectangles[2] = new Rectangle(Engine.getWidth() - 267, Engine.getHeight() - 58, 32, 32);
+        rectangles[3] = new Rectangle(Engine.getWidth() - 141, Engine.getHeight() - 58, 32, 32);
     }
 
     public void update(long delta) {
         super.update(delta);
 
-        switch(selectedId) {
+        switch (selectedId) {
             case 0:
                 Constants.navbar.selectedId = -1;
                 Login.loadingMessage = "";
@@ -68,16 +68,16 @@ public class Footer extends BaseGui {
                 null);
 
         //Draw icons
-        for(int i = 0; i < rectangles.length; i++){
-            if(selectedId == i){
+        for (int i = 0; i < rectangles.length; i++) {
+            if (selectedId == i) {
                 g.drawImage(Images.getFooterIcons()[i + 4],
                         rectangles[i].x,
                         rectangles[i].y,
                         rectangles[i].width,
                         rectangles[i].height,
                         null);
-            }else{
-                if(hoverId != i)
+            } else {
+                if (hoverId != i)
                     g.drawImage(Images.getFooterIcons()[i],
                             rectangles[i].x,
                             rectangles[i].y,
@@ -95,7 +95,7 @@ public class Footer extends BaseGui {
         }
 
         //Hover nav item
-        if(hoverId != -1 && hoverId != selectedId){
+        if (hoverId != -1 && hoverId != selectedId) {
             g.drawImage(Images.getFooterIcons()[hoverId + 4],
                     rectangles[hoverId].x,
                     rectangles[hoverId].y,
@@ -103,7 +103,7 @@ public class Footer extends BaseGui {
                     rectangles[hoverId].height,
                     null);
 
-            switch(hoverId){
+            switch (hoverId) {
                 case 1:
                     g.setColor(ColorConstants.walletNameColor);
 
@@ -117,7 +117,7 @@ public class Footer extends BaseGui {
 
                     //Box
                     g.fillRoundRect(rectangles[hoverId].x - 160,
-                            rectangles[hoverId].y - (((Constants.globalCache.peers.size() + 1)  * 20) + 10),
+                            rectangles[hoverId].y - (((Constants.globalCache.peers.size() + 1) * 20) + 10),
                             360,
                             ((Constants.globalCache.peers.size() + 1) * 20),
                             20,
@@ -129,14 +129,14 @@ public class Footer extends BaseGui {
                     g.setColor(Color.WHITE);
 
                     int i = 0;
-                    for (Iterator iterator = Constants.globalCache.peers.iterator(); iterator.hasNext();) {
+                    for (Iterator iterator = Constants.globalCache.peers.iterator(); iterator.hasNext(); ) {
                         JSONObject peer = (JSONObject) iterator.next();
 
                         if (peer.get("addr") != null) {
                             //Address
                             g.drawString(peer.get("addr").toString(),
                                     rectangles[hoverId].x - 150,
-                                    rectangles[hoverId].y - (((Constants.globalCache.peers.size() + 1) * 20)) + 15 + (i*20));
+                                    rectangles[hoverId].y - (((Constants.globalCache.peers.size() + 1) * 20)) + 15 + (i * 20));
 
                             //Block
                             if (peer.get("currentheight") != null) {
@@ -241,8 +241,6 @@ public class Footer extends BaseGui {
                     );
 
 
-
-
                     g.drawString(
                             Constants.globalCache.currentBlock.get("confirmations").toString(),
                             rectangles[hoverId].x + 10,
@@ -339,20 +337,23 @@ public class Footer extends BaseGui {
         g.setFont(FontConstants.labelFont);
         g.setColor(Color.WHITE);
 
-        if(Constants.globalCache.peers != null && Constants.globalCache.peers.size() > 3)
+        if (Constants.globalCache.peers != null && Constants.globalCache.peers.size() > 0) {
             g.drawString(Constants.globalCache.peers.size() + " peers", rectangles[1].x + 35, Engine.getHeight() - 35);
-        else
+        } else {
             g.drawString("0 peers", rectangles[1].x + 35, Engine.getHeight() - 35);
+        }
 
-        if(Constants.globalCache.info != null && Constants.globalCache.info.size() > 0)
+        if (Constants.globalCache.info != null && Constants.globalCache.info.size() > 0) {
             g.drawString(Constants.globalCache.info.get("blocks").toString(), rectangles[2].x + 35, Engine.getHeight() - 35);
-        else
+        } else {
             g.drawString("Loading", rectangles[2].x + 35, Engine.getHeight() - 35);
+        }
 
-        if(Constants.globalCache.currentBlock != null && Constants.globalCache.currentBlock.get("time") != null)
+        if (Constants.globalCache.currentBlock != null && Constants.globalCache.currentBlock.get("time") != null) {
             g.drawString(TimeUtils.millisToLongM(System.currentTimeMillis() - (Long.valueOf(Constants.globalCache.currentBlock.get("time").toString()) * 1000)) + " ago", rectangles[3].x + 30, Engine.getHeight() - 35);
-        else
+        } else {
             g.drawString("Loading", rectangles[3].x + 30, Engine.getHeight() - 35);
+        }
     }
 
     /**

@@ -1,17 +1,33 @@
-package com.hosvir.decredwallet.utils;
+package com.hosvir.decredwallet;
 
 /**
  * @author fsig
  * @version 1.00
  * @since 20/03/17
  */
-public class JsonObjects {
+public class Param {
+    private int type;
     private String name;
     private String value;
 
-    public JsonObjects(String name, String value){
+    public Param(int type, String value) {
+        this.type = type;
+        this.name = "";
+        this.value = value;
+    }
+
+    public Param(int type, String name, String value) {
+        this.type = type;
         this.name = name;
         this.value = value;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getName() {

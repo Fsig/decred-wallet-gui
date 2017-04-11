@@ -1,10 +1,10 @@
 package com.hosvir.decredwallet.websockets;
 
-import com.hosvir.decredwallet.Constants;
-import com.hosvir.decredwallet.utils.Param;
 import com.deadendgine.utils.Random;
 import com.deadendgine.utils.StringUtils;
 import com.deadendgine.utils.Timer;
+import com.hosvir.decredwallet.Constants;
+import com.hosvir.decredwallet.Param;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
  */
 @ClientEndpoint
 public class DecredEndpoint extends Thread implements Endpoint {
-    private static JSONParser parser = new JSONParser();
+    private JSONParser parser = new JSONParser();
     public boolean connected;
     public int error;
-    private Random random;
     public String uri;
+    private Random random;
     private Session userSession;
     private CountDownLatch latch;
     private WebSocketContainer container;
@@ -41,7 +41,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
      *
      * @param uri
      */
-    public DecredEndpoint(String uri){
+    public DecredEndpoint(String uri) {
         this.uri = uri;
         random = new Random();
         latch = new CountDownLatch(1);
@@ -63,7 +63,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
      */
     @Override
     public boolean connect(String username, String password) {
-        try{
+        try {
             int id = random.random(1, 9999);
             connectTimer.reset();
             container = ContainerProvider.getWebSocketContainer();
@@ -71,16 +71,16 @@ public class DecredEndpoint extends Thread implements Endpoint {
 
             session.getBasicRemote().sendText(
                     "" +
-                    "" +
-                    "{" +
-                    "\"method\":\"authenticate\"," +
-                    "\"params\":[" +
-                    "\"" + username + "\"," +
-                    "\""+ password + "\"" +
-                    "]," +
-                    "\"id\":" + id + "" +
-                    "}" +
-                    ""
+                            "" +
+                            "{" +
+                            "\"method\":\"authenticate\"," +
+                            "\"params\":[" +
+                            "\"" + username + "\"," +
+                            "\"" + password + "\"" +
+                            "]," +
+                            "\"id\":" + id + "" +
+                            "}" +
+                            ""
             );
 
             latch.await(1, TimeUnit.SECONDS);
@@ -89,7 +89,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
             while (getResult(id) == null && !connectTimer.isUp()) {
                 try {
                     latch.await(100, TimeUnit.MICROSECONDS);
-                }catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -102,11 +102,11 @@ public class DecredEndpoint extends Thread implements Endpoint {
                 error = -1;
                 connected = true;
             }
-        } catch(DeploymentException e) {
+        } catch (DeploymentException e) {
             e.printStackTrace();
             connected = false;
             error = 2;
-        } catch(Exception ee) {
+        } catch (Exception ee) {
             ee.printStackTrace();
             connected = false;
             error = 1;
@@ -122,21 +122,21 @@ public class DecredEndpoint extends Thread implements Endpoint {
     public void disconnect() {
         try {
             connected = false;
-            if(session != null) session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,"sesison close"));
-        }catch(Exception e){
+            if (session != null) session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "sesison close"));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
     public synchronized JSONObject callMethod(String method, Param[] params) {
-        if(connected){
+        if (connected) {
             int id = random.random(1, 9999);
             String paramstring = "";
 
-            if(params != null){
-                for(Param p : params){
-                    switch(p.getType()){
+            if (params != null) {
+                for (Param p : params) {
+                    switch (p.getType()) {
                         case 0: //String
                             paramstring += "\"" + p.getValue() + "\",";
                             break;
@@ -149,7 +149,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
                 paramstring = StringUtils.backspace(paramstring);
             }
 
-            if(Constants.isDebug()) Constants.log("METHOD: " + method + " : " + paramstring);
+            if (Constants.isDebug()) Constants.log("METHOD: " + method + " : " + paramstring);
 
             try {
                 session.getBasicRemote().sendText(
@@ -159,33 +159,35 @@ public class DecredEndpoint extends Thread implements Endpoint {
                                 "\"id\":" + id + "}");
 
                 latch.await(200, TimeUnit.MICROSECONDS);
-            }catch(IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
                 connected = false;
                 return null;
-            }catch(Exception ee) {
+            } catch (Exception ee) {
                 ee.printStackTrace();
                 return null;
             }
 
             //Wait for result
             resultTimer.reset();
-            while(getResult(id) == null && !resultTimer.isUp()){
+            while (getResult(id) == null && !resultTimer.isUp()) {
                 try {
                     latch.await(100, TimeUnit.MICROSECONDS);
-                }catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
             //Have the result
             JSONObject result = getResult(id);
-            if(result != null) {
+            if (result != null) {
                 removeResultQueue.add(result.toString());
                 Constants.rpcLog.add("");
                 Constants.rpcLog.add(method + " - " + paramstring);
                 Constants.rpcLog.add(result.toString());
-                if(Constants.guiInterfaces != null && Constants.guiInterfaces.size() > 5) Constants.guiInterfaces.get(5).resize();
+                if (Constants.guiInterfaces != null && Constants.guiInterfaces.size() > 5) {
+                    Constants.guiInterfaces.get(5).resize();
+                }
             }
 
             return result;
@@ -213,7 +215,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
      * Callback hook for Connection close events.
      *
      * @param userSession the userSession which is getting closed.
-     * @param reason the reason for connection close
+     * @param reason      the reason for connection close
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
@@ -265,7 +267,7 @@ public class DecredEndpoint extends Thread implements Endpoint {
                 if (String.valueOf(jsonResult.get("id")).equals(String.valueOf(id))) {
                     return jsonResult;
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
