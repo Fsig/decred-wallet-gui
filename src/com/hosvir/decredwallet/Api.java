@@ -1,6 +1,7 @@
 package com.hosvir.decredwallet;
 
 import com.deadendgine.utils.StringUtils;
+import com.hosvir.decredwallet.gui.Interface;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -293,7 +294,8 @@ public class Api {
         ).get("result").toString();
     }
 
-    public synchronized static String purchaseTicket(String ticketFee, String name, String spendLimit, String address, String numberOfTickets, String poolAddress, String poolFees) {
+    public synchronized static String purchaseTicket(String ticketFee, String name, String spendLimit, String address,
+                                                     String numberOfTickets, String poolAddress, String poolFees, String expiry) {
         //Attempt to set ticket fee
         Api.setTicketFee(ticketFee);
 
@@ -305,7 +307,8 @@ public class Api {
                             new Param(1, spendLimit),
                             new Param(1, "1"),
                             new Param(0, address),
-                            new Param(1, numberOfTickets)
+                            new Param(1, numberOfTickets),
+                            new Param(1, String.valueOf(Integer.valueOf(Constants.globalCache.info.get("blocks").toString()) + Integer.valueOf(expiry)))
                     }
             ).get("message").toString();
         } else {
@@ -318,7 +321,8 @@ public class Api {
                             new Param(0, address),
                             new Param(1, numberOfTickets),
                             new Param(0, poolAddress),
-                            new Param(1, poolFees)
+                            new Param(1, poolFees),
+                            new Param(1, String.valueOf(Integer.valueOf(Constants.globalCache.info.get("blocks").toString()) + Integer.valueOf(expiry)))
                     }
             ).toString();
         }

@@ -36,6 +36,7 @@ public class Login extends Interface {
     public void init() {
         fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new CustomFileFilter("cert", "Certificates"));
+        fileChooser.setFileHidingEnabled(false);
 
         InputBox addressInput = new InputBox("address", Engine.getWidth() / 2 - 180, Engine.getHeight() / 2 - 40, 360, 30);
         InputBox usernameInput = new InputBox("username", Engine.getWidth() / 2 - 180, Engine.getHeight() / 2, 360, 30);

@@ -27,7 +27,8 @@ public class StakingPurchase extends Interface {
         this.components.add(new Label("address", Constants.getLangValue("Pool-Ticket-Address-Label"), 40, 415));
         this.components.add(new Label("pooladdr", Constants.getLangValue("Pool-Address-Label"), 40, 465));
         this.components.add(new Label("poolfee", Constants.getLangValue("Pool-Fee-Label"), 40, 515));
-        this.components.add(new Label("tickets", Constants.getLangValue("Ticket-Count-Label"), 40, 565));
+        this.components.add(new Label("expiry", Constants.getLangValue("Expiry-Label"), 40, 565));
+        this.components.add(new Label("tickets", Constants.getLangValue("Ticket-Count-Label"), 40, 615));
 
         this.components.add(new DropdownBox("fromInput", 250, 245, Engine.getWidth() - 295, 30, Constants.accountNames.toArray(new String[Constants.accountNames.size()])));
         this.components.add(new InputBox("limitInput", 250, 295, Engine.getWidth() - 295, 30));
@@ -35,17 +36,19 @@ public class StakingPurchase extends Interface {
         this.components.add(new InputBox("addressInput", 250, 395, Engine.getWidth() - 295, 30));
         this.components.add(new InputBox("pooladdrInput", 250, 445, Engine.getWidth() - 295, 30));
         this.components.add(new InputBox("poolfeeInput", 250, 495, Engine.getWidth() - 295, 30));
-        this.components.add(new InputBox("ticketInput", 250, 545, Engine.getWidth() - 295, 30));
+        this.components.add(new InputBox("expiryInput", 250, 545, Engine.getWidth() - 295, 30));
+        this.components.add(new InputBox("ticketInput", 250, 595, Engine.getWidth() - 295, 30));
 
-        this.components.add(new Button("cancel", Constants.getLangValue("Cancel-Button-Text"), 40, 595, 100, 35, ColorConstants.flatRed, ColorConstants.flatRedHover));
+        this.components.add(new Button("cancel", Constants.getLangValue("Cancel-Button-Text"), 40, 645, 100, 35, ColorConstants.flatRed, ColorConstants.flatRedHover));
 
-        Button confirmButton = new Button("confirm", Constants.getLangValue("Confirm-Button-Text"), Engine.getWidth() - 140, 595, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover);
+        Button confirmButton = new Button("confirm", Constants.getLangValue("Confirm-Button-Text"), Engine.getWidth() - 140, 645, 100, 35, ColorConstants.flatBlue, ColorConstants.flatBlueHover);
         this.components.add(confirmButton);
 
         this.components.add(new Dialog("errordiag", ""));
 
         //getComponentByName("limitInput").enabled = false;
         getComponentByName("errordiag").width = 800;
+        getComponentByName("expiryInput").text = "14";
         updateDefaults();
 
         headerThird = Engine.getWidth() / 9;
@@ -106,7 +109,8 @@ public class StakingPurchase extends Interface {
                                 getComponentByName("addressInput").text,
                                 getComponentByName("ticketInput").text,
                                 getComponentByName("pooladdrInput").text,
-                                getComponentByName("poolfeeInput").text
+                                getComponentByName("poolfeeInput").text,
+                                getComponentByName("expiryInput").text
                         );
 
                         if (result.contains("not enough to purchase sstx")) {
@@ -284,25 +288,25 @@ public class StakingPurchase extends Interface {
         g.fillRect(30,
                 225,
                 Engine.getWidth() - 60,
-                420);
+                470);
 
         g.drawImage(Images.getInterfaces()[7],
                 Engine.getWidth() - 30,
                 225,
                 10,
-                420,
+                470,
                 null);
 
         g.drawImage(Images.getInterfaces()[6],
                 20,
                 225,
                 10,
-                420,
+                470,
                 null);
 
         g.drawImage(Images.getInterfaces()[19],
                 24,
-                635,
+                685,
                 Engine.getWidth() - 48,
                 60,
                 null);
@@ -324,6 +328,7 @@ public class StakingPurchase extends Interface {
         getComponentByName("ticketInput").width = Engine.getWidth() - 295;
         getComponentByName("pooladdrInput").width = Engine.getWidth() - 295;
         getComponentByName("poolfeeInput").width = Engine.getWidth() - 295;
+        getComponentByName("expiryInput").width = Engine.getWidth() - 295;
         getComponentByName("confirm").x = Engine.getWidth() - 140;
 
         getComponentByName("fromInput").resize();
@@ -333,6 +338,7 @@ public class StakingPurchase extends Interface {
         getComponentByName("ticketInput").resize();
         getComponentByName("pooladdrInput").resize();
         getComponentByName("poolfeeInput").resize();
+        getComponentByName("expiryInput").resize();
         getComponentByName("confirm").resize();
 
         headerThird = Engine.getWidth() / 9;

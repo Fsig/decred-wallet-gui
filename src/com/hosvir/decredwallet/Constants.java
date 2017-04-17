@@ -115,8 +115,8 @@ public class Constants {
      * Initialise constants.
      */
     public static void initialise() {
-        version = "0.2.9";
-        buildDate = "11/04/2017";
+        version = "0.3.1";
+        buildDate = "17/04/2017";
         random = new Random();
         guiLog = new ArrayList<String>();
         langFiles = new ArrayList<String>();
@@ -236,7 +236,7 @@ public class Constants {
             poolName = properties.getProperty("Pool-Name");
             poolUrl = properties.getProperty("Pool-URL");
             poolFeePercent = properties.getProperty("Pool-Fee-Percent");
-            poolAddress = properties.getProperty("Pool-Address");
+            poolAddress = properties.getProperty("Pool-Fee-Address");
             poolTicketAddress = properties.getProperty("Pool-Ticket-Address");
             poolApiKey = properties.getProperty("Pool-API-Key");
             minConfirmations = Integer.valueOf(properties.getProperty("Min-Confirmations-Required"));
@@ -402,6 +402,9 @@ public class Constants {
      */
     private static void createDefaultProperties() {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Decred settings", false, false);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# Location of the dcrd and dcrwallet binaries.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
 
         if (isOsWindows()) {
             FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Decred-Location=C:/users/user/decred/", true, true);
@@ -412,9 +415,19 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#To autostart Decred leave the username and password as random", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Username=random", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Password=random", true, true);
+
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# Public password of your certificate if set.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Public-Password=", true, true);
+
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# If you wish to use testnet set this value to true.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Testnet=false", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#GUI settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Language=English", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Double-Click-Delay=400", true, true);
@@ -423,6 +436,7 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Keystore-Password=" + generateRandomString(32), true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Min-Confirmations-Required=3", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Display settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-OpenGL=true", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-FPS=false", true, true);
@@ -430,12 +444,16 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Min=10", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Debug=false", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#POS Pool settings", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# These settings will be populated automatically when joining a pool.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Account-Name=", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Name=", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-URL=", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Percent=", true, true);
-        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Address=", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Address=", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Ticket-Address=", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-API-Key=", true, true);
 
@@ -480,12 +498,27 @@ public class Constants {
      */
     public static void saveSettings() {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Decred settings", false, false);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# Location of the dcrd and dcrwallet binaries.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Decred-Location=" + decredLocation, true, true);
+
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#To autostart Decred leave the username and password as random", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Username=" + daemonUsername, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Daemon-Password=" + daemonPassword, true, true);
+
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# Public password of your certificate if set.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Public-Password=" + publicPassPhrase, true, true);
+
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "# If you wish to use testnet set this value to true.", true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Testnet=" + testnet, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#GUI settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Language=" + langFile, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Double-Click-Delay=" + doubleClickDelay, true, true);
@@ -494,6 +527,7 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Keystore-Password=" + keystorePassword, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Min-Confirmations-Required=" + minConfirmations, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#Display settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-OpenGL=" + enableOpenGL, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Enable-FPS=" + enableFps, true, true);
@@ -501,12 +535,13 @@ public class Constants {
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "FPS-Min=" + fpsMin, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Debug=" + debug, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "", true, true);
+
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "#POS Pool settings", true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Account-Name=" + poolAccountName, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Name=" + poolName, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-URL=" + poolUrl, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Percent=" + poolFeePercent, true, true);
-        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Address=" + poolAddress, true, true);
+        FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Address=" + poolAddress, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Ticket-Address=" + poolTicketAddress, true, true);
         FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-API-Key=" + poolApiKey, true, true);
     }
@@ -542,7 +577,7 @@ public class Constants {
                 FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Name=", true, true);
                 FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-URL=", true, true);
                 FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Percent=", true, true);
-                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Address=", true, true);
+                FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Fee-Address=", true, true);
                 FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-Ticket-Address=", true, true);
                 FileWriter.writeToFile(settingsFile.getAbsolutePath(), "Pool-API-Key=", true, true);
             }

@@ -95,9 +95,9 @@ public class Main extends BaseGame {
 
         //Set the width and height to be used for window
         Engine.setPreferedWidth(1280);
-        Engine.setPreferedHeight(750);
+        Engine.setPreferedHeight(780);
         Engine.setWidth(1280);
-        Engine.setHeight(750);
+        Engine.setHeight(780);
         Engine.setMinimumWidth(1100);
         Engine.setMinimumHeight(600);
 
